@@ -1,4 +1,4 @@
-import { ChatBubbleOvalLeftIcon, Cog6ToothIcon, LockClosedIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ViewColumnsIcon, ViewfinderCircleIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleOvalLeftIcon, Cog6ToothIcon, HandRaisedIcon, LockClosedIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ViewColumnsIcon, ViewfinderCircleIcon } from '@heroicons/react/24/outline'
 import { useReactFlow } from 'reactflow'
 import React, { useCallback } from 'react'
 
@@ -11,14 +11,14 @@ function Toolbox() {
     }, [setViewport]);
 
     return (
-        <div className='px-2 flex gap-2 border-[#394049] border py-2 bg-[#131517] rounded-lg text-white'>
+        <div className='flex gap-2 text-white'>
             <button className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
                 <LockClosedIcon className='w-5 h-5' />
             </button>
             <button className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
-                <ChatBubbleOvalLeftIcon className='w-5 h-5' />
+                <HandRaisedIcon className='w-5 h-5' />
             </button>
-            {/* <button onClick={() => zoomIn({duration: 800})} className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
+            <button onClick={() => zoomIn({duration: 800})} className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
                 <MagnifyingGlassPlusIcon className='w-5 h-5' />
             </button>
             <button onClick={() => zoomOut({duration: 800})} className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
@@ -26,13 +26,14 @@ function Toolbox() {
             </button>
             <button onClick={() => fitView({duration: 800, maxZoom:1.5})} className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
                 <ViewfinderCircleIcon className='w-5 h-5' />
-            </button> */}
+            </button>
             <button className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
                 <ViewColumnsIcon className='w-5 h-5' />
             </button>
             <button className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
                 <Cog6ToothIcon className='w-5 h-5' />
             </button>
+            {/* <span className='h-[28px] w-[1px] bg-[#394049] my-auto'></span> */}
         </div>
     )
 }

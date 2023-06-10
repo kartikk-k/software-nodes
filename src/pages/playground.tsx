@@ -10,9 +10,9 @@ import Type2 from "@/components/nodes/Type2";
 import CustomEdge from "@/components/edges/CustomEdge";
 import Dock from "@/components/Dock";
 import FormInput from "@/components/ui/form/FormInput";
-import Toolbox from "@/components/Toolbox";
 import Head from "next/head";
 import Appwrite from "@/components/branding/Appwrite";
+import Header from "@/components/Header/Header";
 
 
 
@@ -164,6 +164,7 @@ export default function Home() {
     //     setEdges((els) => addEdge(newEdge, els));
     //   }, [setEdges]);
 
+    // for minimap
     const nodeColor = (node: any) => {
         switch (node.type) {
             case 'type1':
@@ -234,7 +235,7 @@ export default function Home() {
                     {/* </div> */}
 
                     {/* edit node */}
-                    <div className="fixed top-4 right-4 w-56 py-2 bg-[#131517] border border-[#394049] text-white z-20 rounded-lg px-4">
+                    <div className="fixed top-20 right-4 w-56 py-2 bg-[#131517] border border-[#394049] text-white z-20 rounded-lg px-4">
                         <p className="text-sm">Selected node: {activeNode ? activeNode : "none"}</p>
                         <motion.div
                             initial={{ height: 0 }}
@@ -276,15 +277,10 @@ export default function Home() {
                             zoomOnDoubleClick={true}
                             className="touchdevice-flow"
                             onPaneClick={() => { setActiveNode("") }}
-
-                            // onSele
-
                             // view
                             fitView
-
                             // prop options
                             proOptions={proOptions}
-
                         >
 
                             {/* <div className="hidden md:block">
@@ -294,10 +290,8 @@ export default function Home() {
                             {/* background  */}
                             <Background variant={variant} color={variant !== "dots" ? "#4D4E56" : ""} style={{ backgroundColor: "#1A1C1E" }} />
 
-                            <Panel position="top-left">
-                                <Toolbox />
-                            </Panel>
-                            <Panel position="bottom-right">
+                            <Header />
+                            <Panel position="bottom-right" className="h-16 flex items-center" >
                                 <Appwrite />
                             </Panel>
                             <Panel position="bottom-center">
