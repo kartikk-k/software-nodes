@@ -13,6 +13,7 @@ import FormInput from "@/components/ui/form/FormInput";
 import Head from "next/head";
 import Appwrite from "@/components/branding/Appwrite";
 import Header from "@/components/Header/Header";
+import NodeEditor from "@/components/NodeEditor";
 
 
 
@@ -43,6 +44,8 @@ export default function Home() {
                 title: "Remote Device",
                 subtitle: "user connected devices",
                 icon: <ComputerDesktopIcon />,
+                animated: true,
+                themeColor: true,
                 onclick: handleClick
             },
             position: { x: 400, y: 350 },
@@ -54,6 +57,8 @@ export default function Home() {
                 title: "AWS Server",
                 subtitle: "EC2 Instance",
                 icon: <ServerStackIcon />,
+                themeColor: false,
+                animated: false,
                 onclick: handleClick
             },
             position: { x: 600, y: 450 },
@@ -67,8 +72,8 @@ export default function Home() {
     const [activeNodeIcon, setActiveNodeIcon] = useState<(number)>()
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState<object>(initialEdges);
-    const [nodeTitle, setNodeTitle] = useState("")
-    const [nodeSubtitle, setNodeSubtitle] = useState("")
+    // const [nodeTitle, setNodeTitle] = useState("")
+    // const [nodeSubtitle, setNodeSubtitle] = useState("")
     const [variant, setVariant] = useState<BackgroundVariant | null>("dots")
 
     const [id, setId] = useState(3)
@@ -83,13 +88,7 @@ export default function Home() {
     useEffect(() => {
         if (!activeNode) return
         setActiveNodeData(nodes.filter((node) => node.id === activeNode)[0])
-    }, [activeNode])
-
-    useEffect(() => {
-        if (activeNodeData === null) return
-        setNodeTitle(activeNodeData.data.title)
-        setNodeSubtitle(activeNodeData.data.subtitle)
-    }, [activeNodeData])
+    }, [activeNode, nodes])
 
 
     const nodeTypes = useMemo(() => {
@@ -153,17 +152,6 @@ export default function Home() {
         [setEdges]
     )
 
-    // const onConnect = useCallback((connection:any) => {
-    //     const newEdge:Edge = {
-    //       id: `${connection.source.id}-${connection.target.id}`,
-    //       source: connection.source.id,
-    //       target: connection.target.id,
-    //       animated: true,
-    //       label: 'step edge',
-    //     };
-    //     setEdges((els) => addEdge(newEdge, els));
-    //   }, [setEdges]);
-
     // for minimap
     const nodeColor = (node: any) => {
         switch (node.type) {
@@ -175,42 +163,57 @@ export default function Home() {
     };
 
 
-    useEffect(() => {
-        updateNodeTitle()
-    }, [nodeTitle])
+    // useEffect(() => {
+    //     updateNodeTitle()
+    // }, [nodeTitle])
 
-    useEffect(() => {
-        updateNodeSubtitle()
-    }, [nodeSubtitle])
+    // useEffect(() => {
+    //     updateNodeSubtitle()
+    // }, [nodeSubtitle])
 
-    const updateNodeTitle = () => {
+    // const updateNodeTitle = () => {
+    //     setNodes((node) => node.map((n) => {
+    //         if (n.id === activeNode) {
+    //             return {
+    //                 ...n,
+    //                 data: {
+    //                     ...n.data,
+    //                     title: nodeTitle
+    //                 }
+    //             }
+    //         }
+    //         return n;
+    //     }));
+    // }
+
+    // const updateNodeSubtitle = () => {
+    //     setNodes((node) => node.map((n) => {
+    //         if (n.id === activeNode) {
+    //             return {
+    //                 ...n,
+    //                 data: {
+    //                     ...n.data,
+    //                     subtitle: nodeSubtitle
+    //                 }
+    //             }
+    //         }
+    //         return n;
+    //     }));
+    // }
+
+    const updateNodeData = ( id: string, label: string, value: string ) => {
         setNodes((node) => node.map((n) => {
-            if (n.id === activeNode) {
+            if (n.id === id) {
                 return {
                     ...n,
                     data: {
                         ...n.data,
-                        title: nodeTitle
+                        [label]: value
                     }
                 }
             }
-            return n;
-        }));
-    }
-
-    const updateNodeSubtitle = () => {
-        setNodes((node) => node.map((n) => {
-            if (n.id === activeNode) {
-                return {
-                    ...n,
-                    data: {
-                        ...n.data,
-                        subtitle: nodeSubtitle
-                    }
-                }
-            }
-            return n;
-        }));
+            return n
+        }))
     }
 
     return (
@@ -218,6 +221,8 @@ export default function Home() {
             <Head>
                 <title>Software Nodes</title>
                 <meta name="theme-color" content="#1A1C1E" />
+                {/* fix zoom */}
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
             </Head>
             <main className="bg-[#1A1C1E]">
                 <motion.div
@@ -226,16 +231,8 @@ export default function Home() {
                     transition={{ duration: 0.5 }}
                     className="w-screen h-screen overflow-hidden bg-gray-800">
 
-                    {/* add new button */}
-                    {/* <button onClick={() => addNewNode()} className="fixed z-40 bottom-8 right-10 py-2 bg-[#055FFC] text-white rounded-lg px-4">Add New</button> */}
-
-                    {/* dock */}
-                    {/* <div className="fixed z-30 flex px-10 justify-center bottom-4 left-0 w-full border-2 h-auto"> */}
-
-                    {/* </div> */}
-
                     {/* edit node */}
-                    <div className="fixed top-20 right-4 w-56 py-2 bg-[#131517] border border-[#394049] text-white z-20 rounded-lg px-4">
+                    {/* <div className="fixed hidden top-20 right-4 w-56 py-2 bg-[#131517] border border-[#394049] text-white z-20 rounded-lg px-4">
                         <p className="text-sm">Selected node: {activeNode ? activeNode : "none"}</p>
                         <motion.div
                             initial={{ height: 0 }}
@@ -246,14 +243,13 @@ export default function Home() {
                                 <>
                                     <hr className="border-gray-500 my-2" />
                                     <div className="text-sm space-y-4">
-                                        <FormInput label="Id" value={activeNode} onChange={() => console.log("")} editable={false} />
                                         <FormInput label="Title" value={nodeTitle} onChange={setNodeTitle} />
                                         <FormInput label="Subtitle" value={nodeSubtitle} onChange={setNodeSubtitle} />
                                     </div>
                                 </>
                             )}
                         </motion.div>
-                    </div>
+                    </div> */}
 
                     <div className="w-screen h-screen">
                         <ReactFlow
@@ -276,7 +272,7 @@ export default function Home() {
                             snapToGrid={true}
                             zoomOnDoubleClick={true}
                             className="touchdevice-flow"
-                            onPaneClick={() => { setActiveNode("") }}
+                            onPaneClick={() => { setActiveNode(null) }}
                             // view
                             fitView
                             // prop options
@@ -290,12 +286,20 @@ export default function Home() {
                             {/* background  */}
                             <Background variant={variant} color={variant !== "dots" ? "#4D4E56" : ""} style={{ backgroundColor: "#1A1C1E" }} />
 
+                            {/* header */}
                             <Header />
-                            <Panel position="bottom-right" className="h-16 flex items-center" >
-                                <Appwrite />
-                            </Panel>
+
+                            {/* bottom dock */}
                             <Panel position="bottom-center">
                                 <Dock setIcon={setActiveNodeIcon} />
+                            </Panel>
+
+                            {/* node editor */}
+                            <NodeEditor id={activeNode} data={activeNodeData?.data} onChange={updateNodeData} />
+
+                            {/* appwrite logo */}
+                            <Panel position="bottom-right" className="h-16 flex items-center" >
+                                <Appwrite />
                             </Panel>
                         </ReactFlow>
                     </div>

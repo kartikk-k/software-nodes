@@ -1,20 +1,29 @@
 import React from 'react'
 import Toolbox from '../Toolbox'
 import AppLogo from '../branding/AppLogo'
+import { BoltIcon } from '@heroicons/react/24/outline'
 
 function Header() {
     return (
-        <div className='fixed shadow-md p-2 justify-between border-[#394049] border-b bg-[#1A1C1E] flex gap-4 items-center top-0 left-0 z-20 w-screen'>
+        <div className='fixed shadow-md p-2 px-3 justify-between border-[#394049] border-b bg-dark-1 flex gap-4 items-center top-0 left-0 z-20 w-screen'>
             {/* left section */}
-            <div className='flex gap-4 items-center'>
+            <div className='flex w-full gap-4 items-center'>
                 <AppLogo />
                 <span className='h-[28px] w-[1px] bg-[#394049] my-auto'></span>
                 <Toolbox />
             </div>
 
+            <div className='w-full flex justify-center'>
+                <input type="text" className='bg-transparent focus:text-white focus:border-white duration-200 rounded-none border-b-2 text-sm w-32 text-center text-[#A0A6B1] border-[#394049] outline-none px-4 pt-2 pb-1' placeholder='Untitled' />
+            </div>
+
             {/* right section  */}
-            <div>
-                <button className='px-4 py-2 text-white text-xs rounded-md bg-primary'>My Account</button>
+            <div className='w-full flex items-center justify-end gap-2'>
+                <button className='flex text-[#A0A6B1] p-2 px-4 hover:text-white duration-200 active:scale-95 rounded-md hover:bg-[#394049] items-center gap-2 text-xs'>
+                    <BoltIcon className='w-4 h-4' />
+                    <span>Share</span>
+                </button>
+                <button className='px-4 py-2 text-white text-xs rounded-md bg-primary hover:bg-primary-dark duration-200'>My Account</button>
             </div>
         </div>
     )

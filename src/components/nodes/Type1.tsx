@@ -42,7 +42,7 @@ const Type1 = memo(({ data, id }: NodeData) => {
             </div>
 
             {/* handles */}
-            <Handle type="source" isConnectable={true}  position={Position.Bottom} style={{ left: 17, bottom: -3, background: "white" }} />
+            <Handle type="source" isConnectable={true} position={Position.Bottom} style={{ left: 17, bottom: -3, background: "white" }} />
         </div>
     );
 });
