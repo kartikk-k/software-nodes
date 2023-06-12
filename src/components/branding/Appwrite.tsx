@@ -2,7 +2,7 @@ import React from 'react'
 
 function Appwrite() {
     return (
-        <div className='cursor-pointer'>
+        <div className='cursor-pointer hover:scale-105 duration-200'>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="174"
