@@ -24,7 +24,7 @@ function Toolbox() {
             <button onClick={() => zoomOut({duration: 800})} className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
                 <MagnifyingGlassMinusIcon className='w-5 h-5' />
             </button>
-            <button onClick={() => fitView({duration: 800, maxZoom:1.5})} className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
+            <button onClick={() => fitView({duration: 800, maxZoom:1.3})} className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
                 <ViewfinderCircleIcon className='w-5 h-5' />
             </button>
             <button className='p-2 rounded-md hover:bg-[#2f3439] duration-200 active:scale-90'>
