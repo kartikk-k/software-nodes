@@ -3,7 +3,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import Label from './ui/form/Label'
 import PlaygroundContext from '@/context/filecontext'
 import { motion } from 'framer-motion'
-import NodeIcons from './NodeIcons'
+// import NodeIcons from './NodeIcons'
+import IconOptions from './Icons'
 
 
 function CollectionsSidebar() {
@@ -15,8 +16,8 @@ function CollectionsSidebar() {
 
 
     useEffect(() => {
-        setIconsList(NodeIcons)
-    }, [NodeIcons])
+        setIconsList(IconOptions)
+    }, [IconOptions])
 
     // close sidebar when iscollectionsSidebarOpen is false
     useEffect(() => {
@@ -34,9 +35,9 @@ function CollectionsSidebar() {
 
     // search
     useEffect(() => {
-        if(!searchInput.trim()) return setIconsList(NodeIcons)
+        if(!searchInput.trim()) return setIconsList(IconOptions)
 
-        const filteredIcons = NodeIcons.filter(icon => {
+        const filteredIcons = IconOptions.filter(icon => {
             return icon.tags.some(tag => tag.includes(searchInput.toLocaleLowerCase()))
         })
 
