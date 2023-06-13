@@ -18,7 +18,7 @@ function MenuItem({ title, icon = true, onClick, subMenus }: MenuItemProps) {
 
     return (
         <div>
-            <button onClick={() => onClick()} className='flex relative group items-center duration-200 justify-between px-2 py-1 hover:bg-gray-2 hover:bg-opacity-50 rounded-md'>
+            <button onClick={() => onClick()} className='flex w-full relative group items-center duration-200 justify-between px-2 py-1 hover:bg-gray-2 hover:bg-opacity-50 rounded-md'>
                 <span>{title}</span>
                 {icon === true && (
                     <ChevronRightIcon className='w-5 h-5' />

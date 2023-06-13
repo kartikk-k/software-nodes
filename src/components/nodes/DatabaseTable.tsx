@@ -17,7 +17,7 @@ interface NodeData {
 }
 
 
-const Type2 = memo(({ data, id }: NodeData) => {
+const DatabaseTable = memo(({ data, id }: NodeData) => {
 
     const handleClick = () => {
         data.onclick(id, { title: data.title, subtitle: data.subtitle, label: data.label })
@@ -59,4 +59,4 @@ const Type2 = memo(({ data, id }: NodeData) => {
     );
 });
 
-export default Type2
+export default DatabaseTable

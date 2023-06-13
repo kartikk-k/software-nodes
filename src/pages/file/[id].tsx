@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant } from "reactflow"
+import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant, OnConnectStart } from "reactflow"
 import 'reactflow/dist/style.css';
 import { Position } from 'reactflow';
 import { CircleStackIcon, CloudIcon, ComputerDesktopIcon, CpuChipIcon, CubeIcon, FolderIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline';
@@ -18,6 +18,7 @@ import { ID } from "appwrite";
 import { stringify, toJSON, parse } from "flatted";
 import PlaygroundContext, { PlaygroundProvider } from "../../context/filecontext";
 import CollectionsSidebar from "@/components/CollectionsSidebar";
+import IconOptions from "@/components/Icons";
 
 const Icons = [
     { id: 1, label: "Device", icon: <ComputerDesktopIcon /> },
@@ -57,7 +58,7 @@ export default function Playground() {
     const initialNodes: Node[] = [
         {
             id: '1',
-            type: 'type1',
+            type: 'type2',
             data: {
                 label: 'Device',
                 title: "Remote Device",
@@ -65,6 +66,7 @@ export default function Playground() {
                 icon: "Device",
                 animated: true,
                 themeColor: true,
+                background: false,
                 onclick: handleClick
             },
             position: { x: 400, y: 350 },
@@ -79,6 +81,7 @@ export default function Playground() {
                 icon: "Server",
                 themeColor: false,
                 animated: false,
+                background: true,
                 onclick: handleClick
             },
             position: { x: 600, y: 450 },
@@ -86,7 +89,7 @@ export default function Playground() {
         },
     ]
 
-    const {activeNodeIcon, setActiveNodeIcon} = useContext(PlaygroundContext)
+    const { activeNodeIcon, setActiveNodeIcon, panOnDrag, cutEdges, lockChanges } = useContext(PlaygroundContext)
 
 
     const [activeNode, setActiveNode] = useState<string | null>(null)
@@ -100,7 +103,6 @@ export default function Playground() {
     const [iscollectionsSidebarOpen, setCollectionsSidebarOpen] = useState<boolean>(false)
 
     const [id, setId] = useState(3)
-    // const panOnDrag = [1, 2]
     const proOptions = { hideAttribution: true }
 
 
@@ -108,9 +110,57 @@ export default function Playground() {
         // activeNode(activeNodeIcon)
     }, [activeNodeIcon])
 
+    // handles node click
     function handleClick(id: string) {
         setActiveNode(id)
     }
+
+    // handles edge click
+    const handleEdgeClick = (event: React.MouseEvent, edge: Edge) => {
+
+        if(cutEdges === true){
+            setEdges((edges) => edges.filter((n) => n.id !== edge.id))
+        }
+
+        const edgeId = edge.id;
+        const edgeOptions = ['straight', 'smoothstep', 'step', 'default'];
+        const currentEdgeType = edge.type;
+        const currentIndex = edgeOptions.indexOf(currentEdgeType!);
+        const nextIndex = (currentIndex + 1) % edgeOptions.length;
+        const nextEdgeType = edgeOptions[nextIndex];
+        setEdges((edges) =>
+            edges.map((n) => {
+                if (n.id === edgeId) {
+                    return {
+                        ...n,
+                        type: nextEdgeType,
+                    };
+                }
+                return n;
+            })
+        );
+    };
+
+    const handleEdgeContextMenu = (event: React.MouseEvent, edge: Edge) => {
+        event.preventDefault()
+        const edgeId = edge.id
+
+
+        setEdges((edge) => edge.map((n) => {
+            if (n.id === edgeId) {
+                return {
+                    ...n,
+                    animated: !n.animated,
+                }
+            }
+            return n
+        }))
+    }
+
+    const handleEdgeMouseLeave = (event: React.MouseEvent, edge: Edge) => {
+        console.log("mouse leave")
+    }
+
 
     useEffect(() => {
         if (!activeNode) return
@@ -153,6 +203,7 @@ export default function Playground() {
 
     // add node 
     const addNewNode = () => {
+        if(lockChanges === true) return
         const newNode: Node = {
             id: id.toString(),
             type: 'type2',
@@ -161,7 +212,7 @@ export default function Playground() {
                 label: id.toString(),
                 title: "Object",
                 subtitle: "sub heading",
-                icon: activeNodeIcon ? Icons.filter((icon) => icon.id === activeNodeIcon)[0].label : "Device",
+                icon: activeNodeIcon ? IconOptions.filter((icon) => icon.id === activeNodeIcon)[0].label : "Device",
                 onclick: handleClick
             },
             position: { x: 200 + (id * 10), y: 450 },
@@ -177,14 +228,22 @@ export default function Playground() {
 
     // updates node changes
     const handleNodeChange = (e: any) => {
+        if(lockChanges === true) return
         onNodesChange(e)
     }
 
     // updates edge
     const onConnect = useCallback(
-        (params: Edge | Connection) => setEdges((els) => addEdge(params, els)),
+        (params: Edge | Connection) => setEdges((els) => addEdge({ ...params, type: "smoothstep", animated: false }, els)),
         [setEdges]
     )
+
+    const onConnectStart: OnConnectStart = (event) => {
+        return {
+            ...event,
+            type: 'straight',
+        };
+    };
 
     // for minimap
     const nodeColor = (node: any) => {
@@ -285,7 +344,7 @@ export default function Playground() {
 
     return (
         // <PlaygroundProvider>
-            <>
+        <>
             <Head>
                 <title>Software Nodes</title>
                 <meta name="theme-color" content="#1A1C1E" />
@@ -309,22 +368,29 @@ export default function Playground() {
                             onNodesChange={handleNodeChange}
                             onEdgesChange={onEdgesChange}
                             onConnect={onConnect}
+                            onConnectStart={onConnectStart}
                             nodeTypes={nodeTypes}
                             edgeTypes={edgeTypes}
-                            onNodeDragStop={() => saveNodes()}
+                            onEdgeClick={handleEdgeClick}
+                            // onEdgeDoubleClick={handleEdgeDoubleClick}
+                            onEdgeContextMenu={handleEdgeContextMenu}
+                            // onEdgeMouseLeave={handleEdgeMouseLeave}
+                            onEdgeMouseEnter={handleEdgeMouseLeave}
+                            // onNodeDragStop={() => saveNodes()}
 
                             // controls
-                            panOnScroll
-                            selectionOnDrag
-                            // panOnDrag={panOnDrag}
+                            // panOnScroll
+                            selectionOnDrag={true}
+                            panOnDrag={panOnDrag}
                             selectionMode={SelectionMode.Partial}
                             minZoom={0.2}
                             maxZoom={4}
                             snapGrid={[5, 5]}
                             snapToGrid={true}
-                            zoomOnDoubleClick={true}
+                            zoomOnDoubleClick={false}
                             className="touchdevice-flow"
                             onPaneClick={() => { setActiveNode(null) }}
+                            
                             // view
                             fitView
                             // prop options
@@ -365,7 +431,7 @@ export default function Playground() {
 
                 </motion.div>
             </main>
-            </>
+        </>
         // </PlaygroundProvider>
     )
 }
