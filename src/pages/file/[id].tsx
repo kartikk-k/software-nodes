@@ -1,4 +1,3 @@
-"use client"
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant } from "reactflow"
 import 'reactflow/dist/style.css';
@@ -95,7 +94,7 @@ export default function Playground() {
     // const [activeNodeIcon, setActiveNodeIcon] = useState<(number)>()
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState<object>(initialEdges);
-    const [variant, setVariant] = useState<BackgroundVariant | null>("dots")
+    const [variant, setVariant] = useState<BackgroundVariant>(BackgroundVariant.Dots)
 
     const [contentProtector, setContentProtector] = useState<boolean>(false)
     const [iscollectionsSidebarOpen, setCollectionsSidebarOpen] = useState<boolean>(false)
@@ -104,6 +103,10 @@ export default function Playground() {
     // const panOnDrag = [1, 2]
     const proOptions = { hideAttribution: true }
 
+
+    useEffect(() => {
+        // activeNode(activeNodeIcon)
+    }, [activeNodeIcon])
 
     function handleClick(id: string) {
         setActiveNode(id)

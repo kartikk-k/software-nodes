@@ -1,17 +1,23 @@
 import { MagnifyingGlassIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import Label from './ui/form/Label'
-import NodeIcons from './NodeIcons'
 import PlaygroundContext from '@/context/filecontext'
 import { motion } from 'framer-motion'
+// import NodeIcons from './NodeIcons'
+import IconOptions from './Icons'
 
 
 function CollectionsSidebar() {
     const { iscollectionsSidebarOpen, setActiveNodeIcon } = useContext(PlaygroundContext)
 
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false)
-    const [iconsList, setIconsList] = useState(NodeIcons)
+    const [iconsList, setIconsList] = useState<NodeIconsProps[]>([])
     const [searchInput, setSearchInput] = useState<string>('')
+
+
+    useEffect(() => {
+        setIconsList(IconOptions)
+    }, [IconOptions])
 
     // close sidebar when iscollectionsSidebarOpen is false
     useEffect(() => {
@@ -29,9 +35,9 @@ function CollectionsSidebar() {
 
     // search
     useEffect(() => {
-        if(!searchInput.trim()) return setIconsList(NodeIcons)
+        if(!searchInput.trim()) return setIconsList(IconOptions)
 
-        const filteredIcons = NodeIcons.filter(icon => {
+        const filteredIcons = IconOptions.filter(icon => {
             return icon.tags.some(tag => tag.includes(searchInput.toLocaleLowerCase()))
         })
 
@@ -65,7 +71,7 @@ function CollectionsSidebar() {
                             <Label text='Icons' />
                             {/* list of icons */}
                             <div className='flex py-2 flex-wrap gap-x-3 gap-y-1'>
-                                {iconsList.map((icon) => (
+                                {iconsList.length!==0 && iconsList.map((icon) => (
                                     <div onClick={() => setActiveNodeIcon(icon.id)} key={icon.id} className='text-white hover:scale-110 active:scale-100 duration-200 cursor-pointer hover:bg-primary shrink-0 w-9 h-9 px-2 py-2 rounded-lg'>
                                         {icon.icon}
                                     </div>

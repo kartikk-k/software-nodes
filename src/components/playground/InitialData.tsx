@@ -11,7 +11,7 @@ export const InitialNodes = [
             icon: "Device",
             animated: true,
             themeColor: true,
-            onclick: handleClick
+            // onclick: handleClick
         },
         position: { x: 400, y: 350 },
     },
@@ -25,7 +25,7 @@ export const InitialNodes = [
             icon: "Server",
             themeColor: false,
             animated: false,
-            onclick: handleClick
+            // onclick: handleClick
         },
         position: { x: 600, y: 450 },
         targetPosition: Position.Left,
