@@ -1,5 +1,7 @@
 import React, { memo } from 'react'
 import { Handle, Position } from 'reactflow';
+import { GetIcon } from '../NodeIcons';
+import { motion } from 'framer-motion';
 
 interface NodeData {
     id: string,
@@ -7,27 +9,32 @@ interface NodeData {
         label: string
         title?: string,
         subtitle?: string,
-        icon?: React.ReactNode
+        icon: string,
         onclick: (id: string, data: object) => void
     },
 }
 
 
 const Type2 = memo(({ data, id }: NodeData) => {
+
     const handleClick = () => {
-            // alert(id)
-            data.onclick(id, {title: data.title, subtitle: data.subtitle, label: data.label})
-            // onclick(id)
+        data.onclick(id, { title: data.title, subtitle: data.subtitle, label: data.label })
     }
+
+    const icon = GetIcon(data.icon)
+
     return (
-        <div onClick={() => handleClick()}>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={() => handleClick()}>
 
             <div className="flex gap-2 text-white items-center">
                 {/* left side */}
                 <div className="bg-[#394049] shadow-lg shadow-neutral-800 text-white rounded-md p-2 text-sm">
                     {/* icon */}
                     <div className='h-5 w-5 stroke-white'>
-                        {data.icon}
+                        {icon}
                     </div>
                     {/* <ComputerDesktopIcon className="h-5 w-5 stroke-white" /> */}
                 </div>
@@ -44,9 +51,9 @@ const Type2 = memo(({ data, id }: NodeData) => {
             {/* handles */}
             <Handle type="source" position={Position.Bottom} style={{ left: 17, bottom: -3, background: "white" }} />
             <Handle type="target" position={Position.Top} style={{ left: 17, bottom: -3, background: "white" }} />
-            <Handle type="source" position={Position.Right} style={{left: 33,  background: "white" }} />
-            <Handle type="target" position={Position.Left} style={{left: -3,  background: "white" }} />
-        </div>
+            <Handle type="source" position={Position.Right} style={{ left: 33, background: "white" }} />
+            <Handle type="target" position={Position.Left} style={{ left: -3, background: "white" }} />
+        </motion.div>
     );
 });
 
