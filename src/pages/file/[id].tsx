@@ -95,7 +95,7 @@ export default function Playground() {
     // const [activeNodeIcon, setActiveNodeIcon] = useState<(number)>()
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState<object>(initialEdges);
-    const [variant, setVariant] = useState<BackgroundVariant | null>("dots")
+    const [variant, setVariant] = useState<BackgroundVariant>(BackgroundVariant.Dots)
 
     const [contentProtector, setContentProtector] = useState<boolean>(false)
     const [iscollectionsSidebarOpen, setCollectionsSidebarOpen] = useState<boolean>(false)

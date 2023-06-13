@@ -14,13 +14,13 @@ interface NodeEditorProps {
         animated: boolean,
         edgeType?: "straight" | "default" | "step" | "smoothstep" | "straightCross" | "defaultCross" | "stepCross" | "smoothstepCross",
     }
-    onChange?: (id: string, title?: string, subtitle?: string, themeColor?: boolean, animated?: boolean) => void
+    onChange: (id: string, title: string, subtitle: string, themeColor?: boolean, animated?: boolean) => void
 }
 
 function NodeEditor({ id, data, onChange }: NodeEditorProps) {
  
     const handleChange = (label: string, value: any) => {
-        (onChange && id) && onChange(id, label, value)
+        id && onChange(id, label, value)
     }
 
     return (
