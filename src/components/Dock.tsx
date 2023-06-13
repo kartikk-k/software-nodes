@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
     MotionValue,
     motion,
@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 import { useRef } from "react";
 import { CircleStackIcon, CloudIcon, ComputerDesktopIcon, CpuChipIcon, CubeIcon, FolderIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline';
+import PlaygroundContext from '@/context/filecontext';
 
 
 interface DockProps {
@@ -15,6 +16,7 @@ interface DockProps {
 }
 
 function Dock({ setIcon }: DockProps) {
+    const {activeNodeIcon} = useContext(PlaygroundContext)
     const [activeNode, setActiveNode] = useState<number | null>(null)
     const svgClass = "w-[50%] stroke-1"
 
@@ -29,6 +31,11 @@ function Dock({ setIcon }: DockProps) {
         { id: 8, label: "Window/Browser", icon: <WindowIcon className={svgClass} /> }
     ]
     let mouseX = useMotionValue(Infinity);
+
+
+    useEffect(() => {
+        setActiveNode(activeNodeIcon)
+    }, [activeNodeIcon])
 
     const activateNode = (id: number) => {
         setActiveNode(id)

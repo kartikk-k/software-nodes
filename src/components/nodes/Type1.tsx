@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { Handle, Position } from 'reactflow';
-import { GetIcon } from '@components/NodeIcons';
+import { GetIcon } from '@components/Icons';
 import { motion } from 'framer-motion';
 
 interface NodeData {

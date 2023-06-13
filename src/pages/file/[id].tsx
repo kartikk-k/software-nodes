@@ -104,6 +104,10 @@ export default function Playground() {
     const proOptions = { hideAttribution: true }
 
 
+    useEffect(() => {
+        // activeNode(activeNodeIcon)
+    }, [activeNodeIcon])
+
     function handleClick(id: string) {
         setActiveNode(id)
     }
