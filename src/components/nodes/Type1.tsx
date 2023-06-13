@@ -1,5 +1,7 @@
 import React, { memo } from 'react'
 import { Handle, Position } from 'reactflow';
+import { GetIcon } from '../NodeIcons';
+import { motion } from 'framer-motion';
 
 interface NodeData {
     id: string,
@@ -7,7 +9,7 @@ interface NodeData {
         label: string
         title?: string,
         subtitle?: string,
-        icon?: React.ReactNode
+        icon: string,
         onclick: (id: string, data: object) => void
     },
 }
@@ -15,19 +17,26 @@ interface NodeData {
 
 const Type1 = memo(({ data, id }: NodeData) => {
     const handleClick = () => {
-            // alert(id)
-            data.onclick(id, {title: data.title, subtitle: data.subtitle, label: data.label})
-            // onclick(id)
+        // alert(id)
+        data.onclick(id, { title: data.title, subtitle: data.subtitle, label: data.label })
+        // onclick(id)
     }
+
+    const icon = GetIcon(data.icon)
+
     return (
-        <div onClick={() => handleClick()}>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={() => handleClick()}
+        >
 
             <div className="flex gap-2 text-white items-center">
                 {/* left side */}
                 <div className="bg-[#055FFC] text-white rounded-md p-2 text-sm shadow-lg shadow-gray-800">
                     {/* icon */}
                     <div className='h-5 w-5 stroke-white'>
-                        {data.icon}
+                        {icon}
                     </div>
                     {/* <ComputerDesktopIcon className="h-5 w-5 stroke-white" /> */}
                 </div>
@@ -43,7 +52,7 @@ const Type1 = memo(({ data, id }: NodeData) => {
 
             {/* handles */}
             <Handle type="source" isConnectable={true} position={Position.Bottom} style={{ left: 17, bottom: -3, background: "white" }} />
-        </div>
+        </motion.div>
     );
 });
 

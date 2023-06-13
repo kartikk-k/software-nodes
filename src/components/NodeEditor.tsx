@@ -18,13 +18,7 @@ interface NodeEditorProps {
 }
 
 function NodeEditor({ id, data, onChange }: NodeEditorProps) {
-    // const [nodeTitle, setNodeTitle] = useState<string>(data.title)
-    // const [nodeSubtitle, setNodeSubtitle] = useState<string>(data.subtitle)
-    // const [nodeThemeColor, setNodeThemeColor] = useState<boolean>(data.themeColor)
-    // const [nodeAnimated, setNodeAnimated] = useState<boolean>(data.animated)
-    // const [nodeEdgeType, setNodeEdgeType] = useState<string | undefined>(edgeType)
-
-
+ 
     const handleChange = (label: string, value: any) => {
         (onChange && id) && onChange(id, label, value)
     }
@@ -40,7 +34,7 @@ function NodeEditor({ id, data, onChange }: NodeEditorProps) {
             {/* content */}
             <motion.div
                 initial={{ height: 0 }}
-                animate={{ height: id ? "auto" : 0 }}
+                animate={{ height: (id && data) ? "auto" : 0 }}
                 className='overflow-hidden'
             >
                 {/* divider */}

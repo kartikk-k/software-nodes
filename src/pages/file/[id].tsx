@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant } from "reactflow"
 import 'reactflow/dist/style.css';
 import { Position } from 'reactflow';
@@ -17,7 +17,8 @@ import NodeEditor from "@/components/NodeEditor";
 import { appwriteAccount, databases } from "../../../appwrite/appwriteConfig";
 import { ID } from "appwrite";
 import { stringify, toJSON, parse } from "flatted";
-
+import PlaygroundContext, { PlaygroundProvider } from "../../context/filecontext";
+import CollectionsSidebar from "@/components/CollectionsSidebar";
 
 const Icons = [
     { id: 1, label: "Device", icon: <ComputerDesktopIcon /> },
@@ -31,11 +32,24 @@ const Icons = [
 ]
 
 
+interface NodeProps {
+    data: {
+        label: string,
+        title: string,
+        subtitle: string,
+        icon: string,
+        themeColor: boolean,
+        animated: boolean,
+        onclick: (id: string) => void
+    }
+}
+
 export default function Playground() {
 
     const databaseId = "6483cd1f01c3f40565a4"
     const collectionId = "6483cd47e4a0caa617fe"
     const documentId = "6483cdb73a2990410f04"
+
 
     const initialEdges = [
         { id: 'e2-3', source: '1', target: '2', animated: true, type: "smoothstep" },
@@ -49,7 +63,7 @@ export default function Playground() {
                 label: 'Device',
                 title: "Remote Device",
                 subtitle: "user connected devices",
-                icon: <ComputerDesktopIcon />,
+                icon: "Device",
                 animated: true,
                 themeColor: true,
                 onclick: handleClick
@@ -63,7 +77,7 @@ export default function Playground() {
                 label: 'Device',
                 title: "AWS Server",
                 subtitle: "EC2 Instance",
-                icon: <ServerStackIcon />,
+                icon: "Server",
                 themeColor: false,
                 animated: false,
                 onclick: handleClick
@@ -73,17 +87,22 @@ export default function Playground() {
         },
     ]
 
+    const {activeNodeIcon, setActiveNodeIcon} = useContext(PlaygroundContext)
+
 
     const [activeNode, setActiveNode] = useState<string | null>(null)
     const [activeNodeData, setActiveNodeData] = useState<Node | null>(null)
-    const [activeNodeIcon, setActiveNodeIcon] = useState<(number)>()
+    // const [activeNodeIcon, setActiveNodeIcon] = useState<(number)>()
     const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState<object>(initialEdges);
     const [variant, setVariant] = useState<BackgroundVariant | null>("dots")
 
+    const [contentProtector, setContentProtector] = useState<boolean>(false)
+    const [iscollectionsSidebarOpen, setCollectionsSidebarOpen] = useState<boolean>(false)
+
     const [id, setId] = useState(3)
     // const panOnDrag = [1, 2]
-    const proOptions = { hideAttribution: true };
+    const proOptions = { hideAttribution: true }
 
 
     function handleClick(id: string) {
@@ -122,6 +141,13 @@ export default function Playground() {
         addNewNode()
     }, [activeNodeIcon])
 
+    const handleDockActiveIcon = (id: number) => {
+        if (activeNodeIcon === id) {
+            addNewNode()
+        }
+        setActiveNodeIcon(id)
+    }
+
     // add node 
     const addNewNode = () => {
         const newNode: Node = {
@@ -132,7 +158,7 @@ export default function Playground() {
                 label: id.toString(),
                 title: "Object",
                 subtitle: "sub heading",
-                icon: activeNodeIcon ? Icons.filter((icon) => icon.id === activeNodeIcon)[0].icon : <ComputerDesktopIcon />,
+                icon: activeNodeIcon ? Icons.filter((icon) => icon.id === activeNodeIcon)[0].label : "Device",
                 onclick: handleClick
             },
             position: { x: 200 + (id * 10), y: 450 },
@@ -167,15 +193,10 @@ export default function Playground() {
         }
     };
 
-    const [done, setDone] = useState(false)
+    const [filteredNodes, setFilteredNodes] = useState<Node[]>([])
 
     useEffect(() => {
-
-        // if (!nodes || done === true) return
-        // console.log("getting nodes...")
-        // getNodes()
-        // setDone(true)
-        // filterNodes()
+        filterNodes()
     }, [nodes])
 
     const getNodes = async () => {
@@ -190,22 +211,39 @@ export default function Playground() {
         }
     }
 
+    const saveNodes = async () => {
+        console.log(JSON.stringify(filteredNodes))
+        // return
+
+        // try {
+        //     let res = await databases.updateDocument(databaseId, collectionId, documentId, stringify(filteredNodes))
+        //     console.log("res: ", res)
+        // } catch (err) {
+        //     console.log("err: ", err)
+        // }
+    }
+
     const filterNodes = () => {
         let filteredData: any = []
         nodes.map((node) => {
-            filteredData.push({
-                id: node.id,
-                type: node.type,
-                data: {
-                    ...node.data,
-                    icon: ""
-                },
-                position: node.position
-            })
+            if ('onclick' in node.data) {
+                console.log("in")
+                const { onclick, ...rest } = node.data
+
+                filteredData.push({
+                    id: node.id,
+                    type: node.type,
+                    data: rest,
+                    position: node.position
+                })
+            }
         }, [])
+
+        setFilteredNodes(filteredData)
 
         console.log("filteredData: ", filteredData)
     }
+
 
 
     // update nodes
@@ -224,8 +262,27 @@ export default function Playground() {
         }))
     }
 
+    // export nodes as json file
+    const exportNodesData = () => {
+        const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+            JSON.stringify(nodes)
+        )}`;
+
+        const link = document.createElement("a");
+        link.href = jsonString;
+        link.download = "data.json";
+
+        link.click();
+    }
+
+    useEffect(() => {
+        if (!nodes) return
+        // exportNodesData()
+    }, [nodes])
+
     return (
-        <>
+        // <PlaygroundProvider>
+            <>
             <Head>
                 <title>Software Nodes</title>
                 <meta name="theme-color" content="#1A1C1E" />
@@ -233,6 +290,9 @@ export default function Playground() {
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
             </Head>
             <main className="bg-[#1A1C1E]">
+
+
+
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -248,6 +308,7 @@ export default function Playground() {
                             onConnect={onConnect}
                             nodeTypes={nodeTypes}
                             edgeTypes={edgeTypes}
+                            onNodeDragStop={() => saveNodes()}
 
                             // controls
                             panOnScroll
@@ -271,16 +332,23 @@ export default function Playground() {
                                 <MiniMap className="" position="bottom-left" nodeColor={nodeColor} pannable zoomable style={{ backgroundColor: "#000", maskMode: "revert" }} />
                             </div> */}
 
+                            {/* content protector
+                            {contentProtector === true && (
+                                <div onClick={() => setContentProtector(false)} className="w-screen bg-black bg-opacity-30 fixed h-screen z-40"></div>
+                            )} */}
+
                             {/* background  */}
                             <Background variant={variant} color={variant !== "dots" ? "#4D4E56" : ""} style={{ backgroundColor: "#1A1C1E" }} />
 
                             {/* header */}
-                            <Header />
+                            <Header closeMenu={contentProtector} />
 
                             {/* bottom dock */}
                             <Panel position="bottom-center">
-                                <Dock setIcon={setActiveNodeIcon} />
+                                <Dock setIcon={handleDockActiveIcon} />
                             </Panel>
+
+                            <CollectionsSidebar />
 
                             {/* node editor */}
                             <NodeEditor id={activeNode} data={activeNodeData?.data} onChange={updateNodeData} />
@@ -294,6 +362,7 @@ export default function Playground() {
 
                 </motion.div>
             </main>
-        </>
+            </>
+        // </PlaygroundProvider>
     )
 }
