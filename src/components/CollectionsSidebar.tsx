@@ -1,9 +1,9 @@
 import { MagnifyingGlassIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import Label from './ui/form/Label'
-import NodeIcons from '@components/NodeIcons'
 import PlaygroundContext from '@/context/filecontext'
 import { motion } from 'framer-motion'
+import NodeIcons from './NodeIcons'
 
 
 function CollectionsSidebar() {
