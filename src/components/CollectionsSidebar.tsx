@@ -10,8 +10,13 @@ function CollectionsSidebar() {
     const { iscollectionsSidebarOpen, setActiveNodeIcon } = useContext(PlaygroundContext)
 
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false)
-    const [iconsList, setIconsList] = useState(NodeIcons)
+    const [iconsList, setIconsList] = useState<NodeIconsProps[]>([])
     const [searchInput, setSearchInput] = useState<string>('')
+
+
+    useEffect(() => {
+        setIconsList(NodeIcons)
+    }, [NodeIcons])
 
     // close sidebar when iscollectionsSidebarOpen is false
     useEffect(() => {
@@ -65,7 +70,7 @@ function CollectionsSidebar() {
                             <Label text='Icons' />
                             {/* list of icons */}
                             <div className='flex py-2 flex-wrap gap-x-3 gap-y-1'>
-                                {iconsList.map((icon) => (
+                                {iconsList.length!==0 && iconsList.map((icon) => (
                                     <div onClick={() => setActiveNodeIcon(icon.id)} key={icon.id} className='text-white hover:scale-110 active:scale-100 duration-200 cursor-pointer hover:bg-primary shrink-0 w-9 h-9 px-2 py-2 rounded-lg'>
                                         {icon.icon}
                                     </div>

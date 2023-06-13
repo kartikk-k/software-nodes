@@ -4,3 +4,10 @@ interface PlaygroundProps {
     activeNodeIcon: number,
     setActiveNodeIcon: (value:number) => void
 }
+
+interface NodeIconsProps {
+    id: number,
+    label: string,
+    icon: React.ReactNode,
+    tags: string[],
+}
