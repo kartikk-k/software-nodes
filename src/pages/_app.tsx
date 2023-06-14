@@ -1,11 +1,13 @@
-import { PlaygroundProvider } from '@/context/filecontext'
+import { AuthProvider } from '@/context/AuthContext'
+import { PlaygroundProvider } from '@/context/Filecontext'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <>
-    <PlaygroundProvider>
-      <Component {...pageProps} />
-    </PlaygroundProvider>
+  return <> <AuthProvider>
+      <PlaygroundProvider>
+        <Component {...pageProps} />
+      </PlaygroundProvider>
+    </AuthProvider>
   </>
 }

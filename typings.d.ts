@@ -13,6 +13,22 @@ interface PlaygroundProps {
 
     lockChanges: boolean,
     setLockChanges: (value:boolean) => void,
+
+    createNewFile: () => void
+}
+
+interface AuthcontextProps {
+    loginUserWithGithub: () => void,
+    user: User | null,
+    isAuthenticated: boolean,
+}
+
+interface User  {
+    $id: string,
+    email: string,
+    emailVerification: boolean,
+    name: string,
+    status: boolean
 }
 
 interface NodeIconsProps {

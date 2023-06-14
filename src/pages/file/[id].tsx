@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant, OnConnectStart } from "reactflow"
+import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant, OnConnectStart, useViewport, useKeyPress } from "reactflow"
 import 'reactflow/dist/style.css';
 import { Position } from 'reactflow';
 import { CircleStackIcon, CloudIcon, ComputerDesktopIcon, CpuChipIcon, CubeIcon, FolderIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline';
@@ -10,15 +10,15 @@ import CustomEdge from "@/components/edges/CustomEdge";
 import Dock from "@/components/Dock";
 import FormInput from "@/components/ui/form/FormInput";
 import Head from "next/head";
-import Appwrite from "@/components/branding/Appwrite";
-import Header from "@/components/Header/Header";
-import NodeEditor from "@/components/NodeEditor";
-import { appwriteAccount, databases } from "../../../appwrite/appwriteConfig";
-import { ID } from "appwrite";
-import { stringify, toJSON, parse } from "flatted";
-import PlaygroundContext, { PlaygroundProvider } from "../../context/filecontext";
-import CollectionsSidebar from "@/components/CollectionsSidebar";
-import IconOptions from "@/components/Icons";
+import Appwrite from "@/components/branding/Appwrite"
+import Header from "@/components/Header/Header"
+import NodeEditor from "@/components/NodeEditor"
+import { appwriteAccount, databases } from "../../../appwrite/appwriteConfig"
+import { ID } from "appwrite"
+import { stringify, toJSON, parse } from "flatted"
+import PlaygroundContext, { PlaygroundProvider } from "../../context/Filecontext"
+import CollectionsSidebar from "@/components/CollectionsSidebar"
+import IconOptions from "@/components/Icons"
 
 const Icons = [
     { id: 1, label: "Device", icon: <ComputerDesktopIcon /> },
@@ -49,7 +49,6 @@ export default function Playground() {
     const databaseId = "6483cd1f01c3f40565a4"
     const collectionId = "6483cd47e4a0caa617fe"
     const documentId = "6483cdb73a2990410f04"
-
 
     const initialEdges = [
         { id: 'e2-3', source: '1', target: '2', animated: true, type: "smoothstep" },
@@ -100,7 +99,7 @@ export default function Playground() {
     const [variant, setVariant] = useState<BackgroundVariant>(BackgroundVariant.Dots)
 
     const [contentProtector, setContentProtector] = useState<boolean>(false)
-    const [iscollectionsSidebarOpen, setCollectionsSidebarOpen] = useState<boolean>(false)
+    const [selectedNodes, setSelectedNodes] = useState<number | null>()
 
     const [id, setId] = useState(3)
     const proOptions = { hideAttribution: true }
@@ -118,7 +117,7 @@ export default function Playground() {
     // handles edge click
     const handleEdgeClick = (event: React.MouseEvent, edge: Edge) => {
 
-        if(cutEdges === true){
+        if (cutEdges === true) {
             setEdges((edges) => edges.filter((n) => n.id !== edge.id))
         }
 
@@ -203,7 +202,10 @@ export default function Playground() {
 
     // add node 
     const addNewNode = () => {
-        if(lockChanges === true) return
+        if (lockChanges === true) return
+
+        let { x, y } = nodes[nodes.length - 1].position
+
         const newNode: Node = {
             id: id.toString(),
             type: 'type2',
@@ -215,7 +217,7 @@ export default function Playground() {
                 icon: activeNodeIcon ? IconOptions.filter((icon) => icon.id === activeNodeIcon)[0].label : "Device",
                 onclick: handleClick
             },
-            position: { x: 200 + (id * 10), y: 450 },
+            position: { x: x + 100, y: y + 100 },
         }
 
         const tempNode = [...nodes]
@@ -226,9 +228,54 @@ export default function Playground() {
     }
 
 
+    // duplicate node shortcut
+    const cmdAndDPressed = useKeyPress('ControlLeft+KeyD')
+
+    // duplicate node function trigger
+    useEffect(() => {
+        if (!activeNode) return
+        if (!cmdAndDPressed) return
+        duplicateNode()
+
+    }, [cmdAndDPressed])
+
+    // duplicate node function
+    const duplicateNode = () => {
+        if (lockChanges === true) return
+
+        const duplicateData = nodes.filter((node) => node.id === activeNode)[0]
+        const { x, y } = duplicateData.position
+        console.log(duplicateData)
+
+        const newNode: Node = {
+            ...duplicateData,
+            id: id.toString(),
+            type: 'type2',
+            data: {
+                ...duplicateData.data,
+                id: id.toString(),
+                label: id.toString(),
+            },
+            position: { x: x + 200, y: y },
+        }
+
+        const tempNode = [...nodes]
+        tempNode.push(newNode)
+        setNodes(tempNode)
+        setActiveNode(null)
+
+        setId(id + 1)
+    }
+
+    // multi node selection
+    const handleSelectionChange = (elements: any) => {
+        // console.log(elements)
+
+    }
+
     // updates node changes
     const handleNodeChange = (e: any) => {
-        if(lockChanges === true) return
+        if (lockChanges === true) return
         onNodesChange(e)
     }
 
@@ -376,6 +423,8 @@ export default function Playground() {
                             onEdgeContextMenu={handleEdgeContextMenu}
                             // onEdgeMouseLeave={handleEdgeMouseLeave}
                             onEdgeMouseEnter={handleEdgeMouseLeave}
+                            multiSelectionKeyCode={"ShiftLeft"}
+                            onSelectionChange={handleSelectionChange}
                             // onNodeDragStop={() => saveNodes()}
 
                             // controls
@@ -390,7 +439,7 @@ export default function Playground() {
                             zoomOnDoubleClick={false}
                             className="touchdevice-flow"
                             onPaneClick={() => { setActiveNode(null) }}
-                            
+
                             // view
                             fitView
                             // prop options
@@ -407,7 +456,7 @@ export default function Playground() {
                             )} */}
 
                             {/* background  */}
-                            <Background variant={variant} color={variant !== "dots" ? "#4D4E56" : ""} style={{ backgroundColor: "#1A1C1E" }} />
+                            <Background variant={variant} color={variant !== "dots" ? "#2C2F33" : ""} style={{ backgroundColor: "#1A1C1E" }} />
 
                             {/* header */}
                             <Header closeMenu={contentProtector} />

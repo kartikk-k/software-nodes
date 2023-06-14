@@ -1,7 +1,7 @@
 import { ChatBubbleOvalLeftIcon, Cog6ToothIcon, HandRaisedIcon, LockClosedIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, RectangleStackIcon, ScissorsIcon, ViewColumnsIcon, ViewfinderCircleIcon } from '@heroicons/react/24/outline'
 import { useReactFlow } from 'reactflow'
 import React, { useCallback, useContext } from 'react'
-import PlaygroundContext from '@/context/filecontext'
+import PlaygroundContext from '@/context/Filecontext'
 
 
 

@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import MenuItem from './MenuItem'
+import PlaygroundContext from '@/context/Filecontext'
 
 interface MenuProps {
     isOpen: boolean
@@ -9,6 +10,8 @@ interface MenuProps {
 }
 
 function Menu({ isOpen, onClose }: MenuProps) {
+
+    const {createNewFile} = useContext(PlaygroundContext)
 
     const [close, setClose] = useState(false)
 
@@ -33,7 +36,7 @@ function Menu({ isOpen, onClose }: MenuProps) {
 
                 <MenuItem onClick={handleClick} title='File'
                     subMenus={[
-                        { title: 'New', onClick: handleClick },
+                        { title: 'New', onClick:createNewFile },
                         { title: 'Open', onClick: handleClick },
                         { title: 'Dashboard', onClick: handleClick },
                     ]}

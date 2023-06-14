@@ -26,7 +26,7 @@ function MenuItem({ title, icon = true, onClick, subMenus }: MenuItemProps) {
                 {subMenus && (
                     <div className='absolute z-10 p-2 w-44 bg-dark-1 border border-gray-2 rounded-xl left-32 my-2 top-0 group-hover:block hidden '>
                         {subMenus.map((item) => (
-                            <button key={item.title} className={buttonClass} >{item.title}</button>
+                            <button key={item.title} onClick={item.onClick} className={buttonClass} >{item.title}</button>
                         ))}
                     </div>
                 )}
