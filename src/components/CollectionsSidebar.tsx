@@ -1,9 +1,9 @@
 import { MagnifyingGlassIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import Label from './ui/form/Label'
-import PlaygroundContext from '@/context/Filecontext'
+import PlaygroundContext from '../context/Filecontext'
+
 import { motion } from 'framer-motion'
-// import NodeIcons from './NodeIcons'
 import IconOptions from './Icons'
 
 

@@ -14,7 +14,13 @@ interface PlaygroundProps {
     lockChanges: boolean,
     setLockChanges: (value:boolean) => void,
 
-    createNewFile: () => void
+    createNewFile: () => void,
+
+    isFetchingData: boolean,
+
+    projectNodes: [],
+
+    addNodeToDatabase: (node:object) => void,
 }
 
 interface AuthcontextProps {

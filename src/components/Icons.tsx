@@ -54,3 +54,29 @@ export const GetIcon = (label: string) => {
 }
 
 export default IconOptions
+
+
+export const LoadingIcon = () => {
+    return (
+        <div className='z-40 absolute flex flex-col text-white text-sm gap-2 items-center justify-center w-screen h-screen'>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                fill="none"
+                viewBox="0 0 32 32"
+                className='animate-spin'
+            >
+                <path
+                    fill="#000"
+                    d="M32 16c0 8.837-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0s16 7.163 16 16zM4.001 16c0 6.627 5.372 11.999 11.999 11.999 6.627 0 11.999-5.372 11.999-11.999 0-6.627-5.372-11.999-11.999-11.999C9.373 4.001 4.001 9.373 4.001 16z"
+                ></path>
+                <path
+                    fill="#055FFC"
+                    d="M32 16A16 16 0 1116 0v4.001A11.999 11.999 0 1027.999 16H32z"
+                ></path>
+            </svg>
+            <p>Fetching data, please wait...</p>
+        </div>
+    )
+}

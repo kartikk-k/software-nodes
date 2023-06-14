@@ -15,9 +15,6 @@ function Header({ closeMenu }: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
-    const {test}:any = useContext(PlaygroundContext)
-    console.log("test:", test)
-
     useEffect(() => {
         if (closeMenu === true) return
         setIsMenuOpen(false)

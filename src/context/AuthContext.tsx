@@ -8,7 +8,7 @@ import { ToastSuccess } from "@/components/Toasts/Toast";
 const AuthContext = createContext<AuthcontextProps>({
     loginUserWithGithub: () => { },
     user: null,
-    isAuthenticated: false
+    isAuthenticated: false,
 })
 
 export default AuthContext
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null)
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
 
-
+    // trigger for checking if user is logged in
     useEffect(() => {
         getAccount()
     }, [])
@@ -59,11 +59,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const contextData = {
         loginUserWithGithub: loginUserWithGithub,
         user: user,
-        isAuthenticated: isAuthenticated
+        isAuthenticated: isAuthenticated,
     }
 
     return (
         <AuthContext.Provider value={contextData} >
+            {/* globally handling toasts */}
             <Toaster
                  position="top-right"
                  reverseOrder={false}

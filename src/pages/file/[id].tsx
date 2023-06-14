@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant, OnConnectStart, useViewport, useKeyPress } from "reactflow"
+import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant, OnConnectStart, useViewport, useKeyPress, ReactFlowProvider } from "reactflow"
 import 'reactflow/dist/style.css';
 import { Position } from 'reactflow';
 import { CircleStackIcon, CloudIcon, ComputerDesktopIcon, CpuChipIcon, CubeIcon, FolderIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline';
@@ -18,7 +18,11 @@ import { ID } from "appwrite"
 import { stringify, toJSON, parse } from "flatted"
 import PlaygroundContext, { PlaygroundProvider } from "../../context/Filecontext"
 import CollectionsSidebar from "@/components/CollectionsSidebar"
-import IconOptions from "@/components/Icons"
+import IconOptions, { LoadingIcon } from "@/components/Icons"
+import parseJson from "parse-json";
+import { json } from "stream/consumers";
+
+
 
 const Icons = [
     { id: 1, label: "Device", icon: <ComputerDesktopIcon /> },
@@ -31,18 +35,6 @@ const Icons = [
     { id: 8, label: "Window/Browser", icon: <WindowIcon /> }
 ]
 
-
-interface NodeProps {
-    data: {
-        label: string,
-        title: string,
-        subtitle: string,
-        icon: string,
-        themeColor: boolean,
-        animated: boolean,
-        onclick: (id: string) => void
-    }
-}
 
 export default function Playground() {
 
@@ -88,26 +80,35 @@ export default function Playground() {
         },
     ]
 
-    const { activeNodeIcon, setActiveNodeIcon, panOnDrag, cutEdges, lockChanges } = useContext(PlaygroundContext)
-
+    const { activeNodeIcon, setActiveNodeIcon, panOnDrag, cutEdges, lockChanges, isFetchingData, projectNodes, addNodeToDatabase } = useContext(PlaygroundContext)
 
     const [activeNode, setActiveNode] = useState<string | null>(null)
     const [activeNodeData, setActiveNodeData] = useState<Node | null>(null)
-    // const [activeNodeIcon, setActiveNodeIcon] = useState<(number)>()
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
+
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<object>(initialEdges);
+
     const [variant, setVariant] = useState<BackgroundVariant>(BackgroundVariant.Dots)
 
     const [contentProtector, setContentProtector] = useState<boolean>(false)
-    const [selectedNodes, setSelectedNodes] = useState<number | null>()
+
+    const [isDragging, setIsDragging] = useState<boolean>(false)
 
     const [id, setId] = useState(3)
     const proOptions = { hideAttribution: true }
 
 
     useEffect(() => {
-        // activeNode(activeNodeIcon)
-    }, [activeNodeIcon])
+        if (isFetchingData === true || !projectNodes) return
+        if (projectNodes.length >= 1) {
+            projectNodes.forEach((node: Node) => {
+                return node.data.onclick = handleClick
+            })
+            setNodes(projectNodes)
+        } else {
+            setNodes(initialNodes)
+        }
+    }, [isFetchingData, projectNodes])
 
     // handles node click
     function handleClick(id: string) {
@@ -224,8 +225,14 @@ export default function Playground() {
         tempNode.push(newNode)
         setNodes(tempNode)
 
+        addNodeToDatabase(newNode)
+
         setId(id + 1)
     }
+
+    // const addNodeToDatabase = (nodeData:object) => {
+    //     // const promise = databases.createDocument()
+    // }
 
 
     // duplicate node shortcut
@@ -279,6 +286,17 @@ export default function Playground() {
         onNodesChange(e)
     }
 
+    useEffect(() => {
+        if (nodes.length === 0) return
+        if (isDragging) return
+
+        let jstring = JSON.stringify(nodes[0])
+        console.log("string", jstring)
+        let jparse = JSON.parse(jstring)
+        console.log("parsed", jparse)
+
+    }, [isDragging])
+
     // updates edge
     const onConnect = useCallback(
         (params: Edge | Connection) => setEdges((els) => addEdge({ ...params, type: "smoothstep", animated: false }, els)),
@@ -304,9 +322,9 @@ export default function Playground() {
 
     const [filteredNodes, setFilteredNodes] = useState<Node[]>([])
 
-    useEffect(() => {
-        filterNodes()
-    }, [nodes])
+    // useEffect(() => {
+    //     filterNodes()
+    // }, [nodes])
 
     const getNodes = async () => {
         try {
@@ -353,10 +371,14 @@ export default function Playground() {
         console.log("filteredData: ", filteredData)
     }
 
+    useEffect(() => {
+        console.log("sragging: ", isDragging)
+    }, [isDragging])
 
 
     // update nodes
     const updateNodeData = (id: string, label: string, value: string) => {
+
         setNodes((node) => node.map((n) => {
             if (n.id === id) {
                 return {
@@ -406,76 +428,87 @@ export default function Playground() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className="w-screen h-screen overflow-hidden bg-gray-800">
+                    className="w-screen h-screen overflow-hidden bg-gray-1">
 
                     <div className="w-screen h-screen">
-                        <ReactFlow
-                            nodes={nodes}
-                            edges={edges}
-                            onNodesChange={handleNodeChange}
-                            onEdgesChange={onEdgesChange}
-                            onConnect={onConnect}
-                            onConnectStart={onConnectStart}
-                            nodeTypes={nodeTypes}
-                            edgeTypes={edgeTypes}
-                            onEdgeClick={handleEdgeClick}
-                            // onEdgeDoubleClick={handleEdgeDoubleClick}
-                            onEdgeContextMenu={handleEdgeContextMenu}
-                            // onEdgeMouseLeave={handleEdgeMouseLeave}
-                            onEdgeMouseEnter={handleEdgeMouseLeave}
-                            multiSelectionKeyCode={"ShiftLeft"}
-                            onSelectionChange={handleSelectionChange}
-                            // onNodeDragStop={() => saveNodes()}
+                        <ReactFlowProvider>
+                            {isFetchingData === false ? (
 
-                            // controls
-                            // panOnScroll
-                            selectionOnDrag={true}
-                            panOnDrag={panOnDrag}
-                            selectionMode={SelectionMode.Partial}
-                            minZoom={0.2}
-                            maxZoom={4}
-                            snapGrid={[5, 5]}
-                            snapToGrid={true}
-                            zoomOnDoubleClick={false}
-                            className="touchdevice-flow"
-                            onPaneClick={() => { setActiveNode(null) }}
+                                <ReactFlow
+                                    nodes={nodes}
+                                    edges={edges}
+                                    onNodesChange={handleNodeChange}
+                                    onEdgesChange={onEdgesChange}
+                                    onConnect={onConnect}
+                                    onConnectStart={onConnectStart}
+                                    nodeTypes={nodeTypes}
+                                    edgeTypes={edgeTypes}
+                                    onEdgeClick={handleEdgeClick}
+                                    // onEdgeDoubleClick={handleEdgeDoubleClick}
+                                    onEdgeContextMenu={handleEdgeContextMenu}
+                                    // onEdgeMouseLeave={handleEdgeMouseLeave}
+                                    onEdgeMouseEnter={handleEdgeMouseLeave}
+                                    multiSelectionKeyCode={"ShiftLeft"}
+                                    onSelectionChange={handleSelectionChange}
+                                    // onNodeClick={() => setIsDragging(false)}
+                                    onNodeDragStart={() => setIsDragging(true)}
+                                    onNodeDragStop={() => setIsDragging(false)}
 
-                            // view
-                            fitView
-                            // prop options
-                            proOptions={proOptions}
-                        >
+                                    // controls
+                                    panOnScroll
+                                    // selectionOnDrag={true}
+                                    panOnDrag={panOnDrag}
+                                    selectionMode={SelectionMode.Partial}
+                                    minZoom={0.2}
+                                    maxZoom={4}
+                                    snapGrid={[5, 5]}
+                                    snapToGrid={true}
+                                    zoomOnDoubleClick={false}
+                                    className="touchdevice-flow"
+                                    onPaneClick={() => { setActiveNode(null) }}
 
-                            {/* <div className="hidden md:block">
+                                    // view
+                                    fitView
+                                    // prop options
+                                    proOptions={proOptions}
+                                >
+
+                                    {/* <div className="hidden md:block">
                                 <MiniMap className="" position="bottom-left" nodeColor={nodeColor} pannable zoomable style={{ backgroundColor: "#000", maskMode: "revert" }} />
                             </div> */}
 
-                            {/* content protector
+                                    {/* content protector
                             {contentProtector === true && (
                                 <div onClick={() => setContentProtector(false)} className="w-screen bg-black bg-opacity-30 fixed h-screen z-40"></div>
                             )} */}
 
-                            {/* background  */}
-                            <Background variant={variant} color={variant !== "dots" ? "#2C2F33" : ""} style={{ backgroundColor: "#1A1C1E" }} />
+                                    {/* background  */}
+                                    <Background variant={variant} color={variant !== "dots" ? "#2C2F33" : ""} style={{ backgroundColor: "#1A1C1E" }} />
 
-                            {/* header */}
-                            <Header closeMenu={contentProtector} />
+                                    {/* header */}
+                                    <Header closeMenu={contentProtector} />
 
-                            {/* bottom dock */}
-                            <Panel position="bottom-center">
-                                <Dock setIcon={handleDockActiveIcon} />
-                            </Panel>
+                                    {/* bottom dock */}
+                                    <Panel position="bottom-center">
+                                        <Dock setIcon={handleDockActiveIcon} />
+                                    </Panel>
 
-                            <CollectionsSidebar />
+                                    <CollectionsSidebar />
 
-                            {/* node editor */}
-                            <NodeEditor id={activeNode} data={activeNodeData?.data} onChange={updateNodeData} />
+                                    {/* node editor */}
+                                    <NodeEditor id={activeNode} data={activeNodeData?.data} onChange={updateNodeData} />
 
-                            {/* appwrite logo */}
-                            <Panel position="bottom-right" className="h-16 flex items-center" >
-                                <Appwrite />
-                            </Panel>
-                        </ReactFlow>
+                                    {/* appwrite logo */}
+                                    <Panel position="bottom-right" className="h-16 flex items-center" >
+                                        <Appwrite />
+                                    </Panel>
+                                </ReactFlow>
+
+                            ) : (
+                                <LoadingIcon />
+                            )}
+
+                        </ReactFlowProvider>
                     </div>
 
                 </motion.div>
