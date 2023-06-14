@@ -26,8 +26,8 @@ const PlaygroundContext = createContext<PlaygroundProps>({
     createNewFile: () => { },
     isFetchingData: true,
 
-    // projectNodes: [],
-    addNodeToDatabase: (node: object) => { },
+    // projectNodes: Node[],
+    // addNodeToDatabase: (node: object) => { },
 })
 
 export default PlaygroundContext
@@ -48,7 +48,7 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
     const [lockChanges, setLockChanges] = useState<boolean>(false)
 
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true)
-    const [projectNodes, setProjectNodes] = useState<Node[] | undefined>([])
+    const [projectNodes, setProjectNodes] = useState<Node[]>([])
 
 
     let router = useRouter()
@@ -219,33 +219,33 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
 
     const contextData = {
         // collections sidebar
-        iscollectionsSidebarOpen: iscollectionsSidebarOpen,
-        setIscollectionsSidebarOpen: setIscollectionsSidebarOpen,
+        iscollectionsSidebarOpen,
+        setIscollectionsSidebarOpen,
 
         // active node icon
-        activeNodeIcon: activeNodeIcon,
-        setActiveNodeIcon: setActiveNodeIcon,
+        activeNodeIcon,
+        setActiveNodeIcon,
 
         // cut edges
-        cutEdges: cutEdges,
-        setCutEdges: setCutEdges,
+        cutEdges,
+        setCutEdges,
 
         // pan options
-        panOnDrag: panOnDrag,
-        setPanOnDrag: setPanOnDrag,
+        panOnDrag,
+        setPanOnDrag,
 
         // lock changes
-        lockChanges: lockChanges,
-        setLockChanges: setLockChanges,
+        lockChanges,
+        setLockChanges,
 
-        createNewFile: createNewFile,
-        isFetchingData: isFetchingData,
+        createNewFile,
+        isFetchingData,
 
         // project data
-        projectNodes: projectNodes,
-        setProjectNodes: setProjectNodes,
+        projectNodes,
+        setProjectNodes,
 
-        addNodeToDatabase: addNodeToDatabase,
+        addNodeToDatabase,
 
 
     }

@@ -1,5 +1,5 @@
 import { AuthProvider } from '../../context/AuthContext'
-import { PlaygroundProvider } from '@/context/Filecontext'
+import { PlaygroundProvider } from '../../context/Filecontext'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 
