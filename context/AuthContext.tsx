@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { appwriteAccount } from "../appwrite/appwriteConfig";
+import { appwriteAccount } from "../src/appwrite/appwriteConfig";
 import toast, { Toaster } from "react-hot-toast";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import { ToastSuccess } from "@/components/Toasts/Toast";

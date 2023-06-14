@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import AuthContext from "./AuthContext";
 import { ToastError, ToastSuccess } from "@/components/Toasts/Toast";
-import { appwriteAccount, databases } from "../appwrite/appwriteConfig";
+import { appwriteAccount, databases } from "../src/appwrite/appwriteConfig";
 import { ID, Query } from "appwrite";
 import { useRouter } from "next/router";
 import {  useNodesState } from "reactflow";

@@ -1,6 +1,6 @@
 import AppLogo from '@/components/branding/AppLogo'
 import GithubLogo from '@/components/branding/GithubLogo'
-import AuthContext from '@/context/AuthContext'
+import AuthContext from '../../../context/AuthContext'
 import React, { useContext } from 'react'
 
 function Login() {
