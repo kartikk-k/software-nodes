@@ -8,7 +8,7 @@ import {
 } from "framer-motion";
 import { useRef } from "react";
 import { CircleStackIcon, CloudIcon, ComputerDesktopIcon, CpuChipIcon, CubeIcon, FolderIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline';
-import PlaygroundContext from '@/context/Filecontext';
+import PlaygroundContext from '../context/Filecontext';
 
 
 interface DockProps {
