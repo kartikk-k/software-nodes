@@ -8,15 +8,14 @@ import {
 } from "framer-motion";
 import { useRef } from "react";
 import { CircleStackIcon, CloudIcon, ComputerDesktopIcon, CpuChipIcon, CubeIcon, FolderIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline';
-import * as FileContext from '../context/Filecontext';
-
+import PlaygroundContext from '@/context/Filecontext';
 
 interface DockProps {
     setIcon: (id: number) => void
 }
 
 function Dock({ setIcon }: DockProps) {
-    const {activeNodeIcon} = useContext(FileContext.default)
+    const {activeNodeIcon}:PlaygroundProps = useContext(PlaygroundContext)
     const [activeNode, setActiveNode] = useState<number | null>(null)
     const svgClass = "w-[50%] stroke-1"
 
