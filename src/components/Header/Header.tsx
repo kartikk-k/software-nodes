@@ -4,7 +4,6 @@ import AppLogo from '../branding/AppLogo'
 import { BoltIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import Menu from '../menu/Menu'
-import PlaygroundContext from '../../context/Filecontext'
 
 interface HeaderProps {
     closeMenu: boolean
