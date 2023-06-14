@@ -12,13 +12,12 @@ interface NodeEditorProps {
         subtitle: string,
         themeColor: boolean,
         animated: boolean,
-        background: boolean,
         edgeType?: "straight" | "default" | "step" | "smoothstep" | "straightCross" | "defaultCross" | "stepCross" | "smoothstepCross",
     }
-    onChange: (id: string, title: string, subtitle: string, themeColor?: boolean, animated?: boolean, background?: boolean) => void
+    onChange: (id: string, title: string, subtitle: string, themeColor?: boolean, animated?: boolean) => void
 }
 
-function NodeEditor({ id, data, onChange }: NodeEditorProps) {
+function EdgeEditor({ id, data, onChange }: NodeEditorProps) {
  
     const handleChange = (label: string, value: any) => {
         id && onChange(id, label, value)
@@ -33,6 +32,7 @@ function NodeEditor({ id, data, onChange }: NodeEditorProps) {
             </div>
 
             {/* content */}
+
             <motion.div
                 initial={{ height: 0 }}
                 animate={{ height: (id && data) ? "auto" : 0 }}
@@ -64,15 +64,9 @@ function NodeEditor({ id, data, onChange }: NodeEditorProps) {
                         </div>
 
                         {/* animated edge */}
-                        {/* <div className='space-y-2'>
+                        <div className='space-y-2'>
                             <Label text='Animated' />
                             <Switch value={data.animated} onChange={((value: boolean) => handleChange("animated", value))} />
-                        </div> */}
-
-                        {/* background */}
-                        <div className='space-y-2'>
-                            <Label text='Background' />
-                            <Switch value={data.background} onChange={((value: boolean) => handleChange("background", value))} />
                         </div>
 
                     </div>
@@ -83,4 +77,4 @@ function NodeEditor({ id, data, onChange }: NodeEditorProps) {
     )
 }
 
-export default NodeEditor
+export default EdgeEditor

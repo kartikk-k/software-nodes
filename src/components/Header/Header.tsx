@@ -4,7 +4,7 @@ import AppLogo from '../branding/AppLogo'
 import { BoltIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import Menu from '../menu/Menu'
-import PlaygroundContext from '../../context/filecontext'
+import PlaygroundContext from '../../context/Filecontext'
 
 interface HeaderProps {
     closeMenu: boolean
@@ -14,9 +14,6 @@ function Header({ closeMenu }: HeaderProps) {
 
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
     const menuRef = useRef<HTMLDivElement>(null)
-
-    const {test}:any = useContext(PlaygroundContext)
-    console.log("test:", test)
 
     useEffect(() => {
         if (closeMenu === true) return

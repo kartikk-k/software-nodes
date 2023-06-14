@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant } from "reactflow"
+import ReactFlow, { Node, addEdge, SelectionMode, Panel, MiniMap, ControlButton, Controls, MarkerType, Background, Edge, Connection, useNodesState, useEdgesState, BackgroundVariant, OnConnectStart, useViewport, useKeyPress, ReactFlowProvider } from "reactflow"
 import 'reactflow/dist/style.css';
 import { Position } from 'reactflow';
 import { CircleStackIcon, CloudIcon, ComputerDesktopIcon, CpuChipIcon, CubeIcon, FolderIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline';
@@ -7,17 +7,17 @@ import { motion } from "framer-motion";
 import Type1 from "@/components/nodes/Type1";
 import Type2 from "@/components/nodes/Type2";
 import CustomEdge from "@/components/edges/CustomEdge";
-import Dock from "@/components/Dock";
-import FormInput from "@/components/ui/form/FormInput";
+// import Dock from "@/components/Dock";
 import Head from "next/head";
-import Appwrite from "@/components/branding/Appwrite";
-import Header from "@/components/Header/Header";
-import NodeEditor from "@/components/NodeEditor";
-import { appwriteAccount, databases } from "../../../appwrite/appwriteConfig";
-import { ID } from "appwrite";
-import { stringify, toJSON, parse } from "flatted";
-import PlaygroundContext, { PlaygroundProvider } from "../../context/filecontext";
-import CollectionsSidebar from "@/components/CollectionsSidebar";
+import Appwrite from "@/components/branding/Appwrite"
+import Header from "@/components/Header/Header"
+import NodeEditor from "@/components/NodeEditor"
+import { databases } from "../../appwrite/appwriteConfig"
+import PlaygroundContext from "../../context/Filecontext"
+import IconOptions, { LoadingIcon } from "@/components/Icons"
+import ObjectOptions from "@/components/ObjectOptions";
+
+
 
 const Icons = [
     { id: 1, label: "Device", icon: <ComputerDesktopIcon /> },
@@ -31,24 +31,11 @@ const Icons = [
 ]
 
 
-interface NodeProps {
-    data: {
-        label: string,
-        title: string,
-        subtitle: string,
-        icon: string,
-        themeColor: boolean,
-        animated: boolean,
-        onclick: (id: string) => void
-    }
-}
-
 export default function Playground() {
 
     const databaseId = "6483cd1f01c3f40565a4"
     const collectionId = "6483cd47e4a0caa617fe"
     const documentId = "6483cdb73a2990410f04"
-
 
     const initialEdges = [
         { id: 'e2-3', source: '1', target: '2', animated: true, type: "smoothstep" },
@@ -57,7 +44,7 @@ export default function Playground() {
     const initialNodes: Node[] = [
         {
             id: '1',
-            type: 'type1',
+            type: 'type2',
             data: {
                 label: 'Device',
                 title: "Remote Device",
@@ -65,6 +52,7 @@ export default function Playground() {
                 icon: "Device",
                 animated: true,
                 themeColor: true,
+                background: false,
                 onclick: handleClick
             },
             position: { x: 400, y: 350 },
@@ -79,6 +67,7 @@ export default function Playground() {
                 icon: "Server",
                 themeColor: false,
                 animated: false,
+                background: true,
                 onclick: handleClick
             },
             position: { x: 600, y: 450 },
@@ -86,31 +75,87 @@ export default function Playground() {
         },
     ]
 
-    const {activeNodeIcon, setActiveNodeIcon} = useContext(PlaygroundContext)
-
+    const { activeNodeIcon, setActiveNodeIcon, panOnDrag, cutEdges, lockChanges, isFetchingData, projectNodes, addNodeToDatabase } = useContext(PlaygroundContext)
 
     const [activeNode, setActiveNode] = useState<string | null>(null)
     const [activeNodeData, setActiveNodeData] = useState<Node | null>(null)
-    // const [activeNodeIcon, setActiveNodeIcon] = useState<(number)>()
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
+
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<object>(initialEdges);
+
     const [variant, setVariant] = useState<BackgroundVariant>(BackgroundVariant.Dots)
 
     const [contentProtector, setContentProtector] = useState<boolean>(false)
-    const [iscollectionsSidebarOpen, setCollectionsSidebarOpen] = useState<boolean>(false)
+
+    const [isDragging, setIsDragging] = useState<boolean>(false)
 
     const [id, setId] = useState(3)
-    // const panOnDrag = [1, 2]
     const proOptions = { hideAttribution: true }
 
 
     useEffect(() => {
-        // activeNode(activeNodeIcon)
-    }, [activeNodeIcon])
+        if (isFetchingData === true || !projectNodes) return
+        if (projectNodes.length >= 1) {
+            projectNodes.forEach((node: Node) => {
+                return node.data.onclick = handleClick
+            })
+            setNodes(projectNodes)
+        } else {
+            setNodes(initialNodes)
+        }
+    }, [isFetchingData, projectNodes])
 
+    // handles node click
     function handleClick(id: string) {
         setActiveNode(id)
     }
+
+    // handles edge click
+    const handleEdgeClick = (event: React.MouseEvent, edge: Edge) => {
+
+        if (cutEdges === true) {
+            setEdges((edges) => edges.filter((n) => n.id !== edge.id))
+        }
+
+        const edgeId = edge.id;
+        const edgeOptions = ['straight', 'smoothstep', 'step', 'default'];
+        const currentEdgeType = edge.type;
+        const currentIndex = edgeOptions.indexOf(currentEdgeType!);
+        const nextIndex = (currentIndex + 1) % edgeOptions.length;
+        const nextEdgeType = edgeOptions[nextIndex];
+        setEdges((edges) =>
+            edges.map((n) => {
+                if (n.id === edgeId) {
+                    return {
+                        ...n,
+                        type: nextEdgeType,
+                    };
+                }
+                return n;
+            })
+        );
+    };
+
+    const handleEdgeContextMenu = (event: React.MouseEvent, edge: Edge) => {
+        event.preventDefault()
+        const edgeId = edge.id
+
+
+        setEdges((edge) => edge.map((n) => {
+            if (n.id === edgeId) {
+                return {
+                    ...n,
+                    animated: !n.animated,
+                }
+            }
+            return n
+        }))
+    }
+
+    const handleEdgeMouseLeave = (event: React.MouseEvent, edge: Edge) => {
+        console.log("mouse leave")
+    }
+
 
     useEffect(() => {
         if (!activeNode) return
@@ -153,6 +198,10 @@ export default function Playground() {
 
     // add node 
     const addNewNode = () => {
+        if (lockChanges === true) return
+
+        let { x, y } = nodes[nodes.length - 1].position
+
         const newNode: Node = {
             id: id.toString(),
             type: 'type2',
@@ -161,30 +210,100 @@ export default function Playground() {
                 label: id.toString(),
                 title: "Object",
                 subtitle: "sub heading",
-                icon: activeNodeIcon ? Icons.filter((icon) => icon.id === activeNodeIcon)[0].label : "Device",
+                icon: activeNodeIcon ? IconOptions.filter((icon) => icon.id === activeNodeIcon)[0].label : "Device",
                 onclick: handleClick
             },
-            position: { x: 200 + (id * 10), y: 450 },
+            position: { x: x + 100, y: y + 100 },
         }
 
         const tempNode = [...nodes]
         tempNode.push(newNode)
         setNodes(tempNode)
 
+        addNodeToDatabase(newNode)
+
         setId(id + 1)
     }
 
+    // const addNodeToDatabase = (nodeData:object) => {
+    //     // const promise = databases.createDocument()
+    // }
+
+
+    // duplicate node shortcut
+    const cmdAndDPressed = useKeyPress('ControlLeft+KeyD')
+
+    // duplicate node function trigger
+    useEffect(() => {
+        if (!activeNode) return
+        if (!cmdAndDPressed) return
+        duplicateNode()
+
+    }, [cmdAndDPressed])
+
+    // duplicate node function
+    const duplicateNode = () => {
+        if (lockChanges === true) return
+
+        const duplicateData = nodes.filter((node) => node.id === activeNode)[0]
+        const { x, y } = duplicateData.position
+        console.log(duplicateData)
+
+        const newNode: Node = {
+            ...duplicateData,
+            id: id.toString(),
+            type: 'type2',
+            data: {
+                ...duplicateData.data,
+                id: id.toString(),
+                label: id.toString(),
+            },
+            position: { x: x + 200, y: y },
+        }
+
+        const tempNode = [...nodes]
+        tempNode.push(newNode)
+        setNodes(tempNode)
+        setActiveNode(null)
+
+        setId(id + 1)
+    }
+
+    // multi node selection
+    const handleSelectionChange = (elements: any) => {
+        // console.log(elements)
+
+    }
 
     // updates node changes
     const handleNodeChange = (e: any) => {
+        if (lockChanges === true) return
         onNodesChange(e)
     }
 
+    useEffect(() => {
+        if (nodes.length === 0) return
+        if (isDragging) return
+
+        let jstring = JSON.stringify(nodes[0])
+        console.log("string", jstring)
+        let jparse = JSON.parse(jstring)
+        console.log("parsed", jparse)
+
+    }, [isDragging])
+
     // updates edge
     const onConnect = useCallback(
-        (params: Edge | Connection) => setEdges((els) => addEdge(params, els)),
+        (params: Edge | Connection) => setEdges((els) => addEdge({ ...params, type: "smoothstep", animated: false }, els)),
         [setEdges]
     )
+
+    const onConnectStart: OnConnectStart = (event) => {
+        return {
+            ...event,
+            type: 'straight',
+        };
+    };
 
     // for minimap
     const nodeColor = (node: any) => {
@@ -198,9 +317,9 @@ export default function Playground() {
 
     const [filteredNodes, setFilteredNodes] = useState<Node[]>([])
 
-    useEffect(() => {
-        filterNodes()
-    }, [nodes])
+    // useEffect(() => {
+    //     filterNodes()
+    // }, [nodes])
 
     const getNodes = async () => {
         try {
@@ -247,10 +366,14 @@ export default function Playground() {
         console.log("filteredData: ", filteredData)
     }
 
+    useEffect(() => {
+        console.log("sragging: ", isDragging)
+    }, [isDragging])
 
 
     // update nodes
     const updateNodeData = (id: string, label: string, value: string) => {
+
         setNodes((node) => node.map((n) => {
             if (n.id === id) {
                 return {
@@ -285,7 +408,7 @@ export default function Playground() {
 
     return (
         // <PlaygroundProvider>
-            <>
+        <>
             <Head>
                 <title>Software Nodes</title>
                 <meta name="theme-color" content="#1A1C1E" />
@@ -300,72 +423,92 @@ export default function Playground() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className="w-screen h-screen overflow-hidden bg-gray-800">
+                    className="w-screen h-screen overflow-hidden bg-gray-1">
 
                     <div className="w-screen h-screen">
-                        <ReactFlow
-                            nodes={nodes}
-                            edges={edges}
-                            onNodesChange={handleNodeChange}
-                            onEdgesChange={onEdgesChange}
-                            onConnect={onConnect}
-                            nodeTypes={nodeTypes}
-                            edgeTypes={edgeTypes}
-                            onNodeDragStop={() => saveNodes()}
+                        <ReactFlowProvider>
+                            {isFetchingData === false ? (
 
-                            // controls
-                            panOnScroll
-                            selectionOnDrag
-                            // panOnDrag={panOnDrag}
-                            selectionMode={SelectionMode.Partial}
-                            minZoom={0.2}
-                            maxZoom={4}
-                            snapGrid={[5, 5]}
-                            snapToGrid={true}
-                            zoomOnDoubleClick={true}
-                            className="touchdevice-flow"
-                            onPaneClick={() => { setActiveNode(null) }}
-                            // view
-                            fitView
-                            // prop options
-                            proOptions={proOptions}
-                        >
+                                <ReactFlow
+                                    nodes={nodes}
+                                    edges={edges}
+                                    onNodesChange={handleNodeChange}
+                                    onEdgesChange={onEdgesChange}
+                                    onConnect={onConnect}
+                                    onConnectStart={onConnectStart}
+                                    nodeTypes={nodeTypes}
+                                    edgeTypes={edgeTypes}
+                                    onEdgeClick={handleEdgeClick}
+                                    // onEdgeDoubleClick={handleEdgeDoubleClick}
+                                    onEdgeContextMenu={handleEdgeContextMenu}
+                                    // onEdgeMouseLeave={handleEdgeMouseLeave}
+                                    onEdgeMouseEnter={handleEdgeMouseLeave}
+                                    multiSelectionKeyCode={"ShiftLeft"}
+                                    onSelectionChange={handleSelectionChange}
+                                    // onNodeClick={() => setIsDragging(false)}
+                                    onNodeDragStart={() => setIsDragging(true)}
+                                    onNodeDragStop={() => setIsDragging(false)}
 
-                            {/* <div className="hidden md:block">
+                                    // controls
+                                    panOnScroll
+                                    // selectionOnDrag={true}
+                                    panOnDrag={panOnDrag}
+                                    selectionMode={SelectionMode.Partial}
+                                    minZoom={0.2}
+                                    maxZoom={4}
+                                    snapGrid={[5, 5]}
+                                    snapToGrid={true}
+                                    zoomOnDoubleClick={false}
+                                    className="touchdevice-flow"
+                                    onPaneClick={() => { setActiveNode(null) }}
+
+                                    // view
+                                    fitView
+                                    // prop options
+                                    proOptions={proOptions}
+                                >
+
+                                    {/* <div className="hidden md:block">
                                 <MiniMap className="" position="bottom-left" nodeColor={nodeColor} pannable zoomable style={{ backgroundColor: "#000", maskMode: "revert" }} />
                             </div> */}
 
-                            {/* content protector
+                                    {/* content protector
                             {contentProtector === true && (
                                 <div onClick={() => setContentProtector(false)} className="w-screen bg-black bg-opacity-30 fixed h-screen z-40"></div>
                             )} */}
 
-                            {/* background  */}
-                            <Background variant={variant} color={variant !== "dots" ? "#4D4E56" : ""} style={{ backgroundColor: "#1A1C1E" }} />
+                                    {/* background  */}
+                                    <Background variant={variant} color={variant !== "dots" ? "#2C2F33" : ""} style={{ backgroundColor: "#1A1C1E" }} />
 
-                            {/* header */}
-                            <Header closeMenu={contentProtector} />
+                                    {/* header */}
+                                    <Header closeMenu={contentProtector} />
 
-                            {/* bottom dock */}
-                            <Panel position="bottom-center">
-                                <Dock setIcon={handleDockActiveIcon} />
-                            </Panel>
+                                    {/* bottom dock */}
+                                    <Panel position="bottom-center">
+                                        {/* <Dock setIcon={handleDockActiveIcon} /> */}
+                                    </Panel>
 
-                            <CollectionsSidebar />
+                                    <ObjectOptions />
 
-                            {/* node editor */}
-                            <NodeEditor id={activeNode} data={activeNodeData?.data} onChange={updateNodeData} />
+                                    {/* node editor */}
+                                    <NodeEditor id={activeNode} data={activeNodeData?.data} onChange={updateNodeData} />
 
-                            {/* appwrite logo */}
-                            <Panel position="bottom-right" className="h-16 flex items-center" >
-                                <Appwrite />
-                            </Panel>
-                        </ReactFlow>
+                                    {/* appwrite logo */}
+                                    <Panel position="bottom-right" className="h-16 flex items-center" >
+                                        <Appwrite />
+                                    </Panel>
+                                </ReactFlow>
+
+                            ) : (
+                                <LoadingIcon />
+                            )}
+
+                        </ReactFlowProvider>
                     </div>
 
                 </motion.div>
             </main>
-            </>
+        </>
         // </PlaygroundProvider>
     )
 }

@@ -1,8 +1,40 @@
 interface PlaygroundProps {
     iscollectionsSidebarOpen: boolean,
-    setIscollectionsSidebarOpen: (value:boolean) => void
+    setIscollectionsSidebarOpen: (value:boolean) => void,
+
     activeNodeIcon: number,
-    setActiveNodeIcon: (value:number) => void
+    setActiveNodeIcon: (value:number) => void,
+
+    cutEdges: boolean,
+    setCutEdges: (value:boolean) => void,
+
+    panOnDrag: boolean,
+    setPanOnDrag: (value:boolean) => void,
+
+    lockChanges: boolean,
+    setLockChanges: (value:boolean) => void,
+
+    createNewFile: () => void,
+
+    isFetchingData: boolean,
+
+    projectNodes?: [],
+
+    addNodeToDatabase: (node:object) => void,
+}
+
+interface AuthcontextProps {
+    loginUserWithGithub: () => void,
+    user: User | null,
+    isAuthenticated: boolean,
+}
+
+interface User  {
+    $id: string,
+    email: string,
+    emailVerification: boolean,
+    name: string,
+    status: boolean
 }
 
 interface NodeIconsProps {
