@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/core": "7.12.10",
+    "@babel/preset-env": "7.12.10",
+    "@babel/preset-react": "^7.12.10",
     "@heroicons/react": "^2.0.18",
     "@reactflow/core": "^11.7.2",
     "@types/node": "20.2.5",
