@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import IconOptions from './Icons'
 
 
-function CollectionsSidebar() {
+function ObjectOptions() {
     const { iscollectionsSidebarOpen, setActiveNodeIcon } = useContext(PlaygroundContext)
 
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false)
@@ -88,4 +88,4 @@ function CollectionsSidebar() {
     )
 }
 
-export default CollectionsSidebar
+export default ObjectOptions

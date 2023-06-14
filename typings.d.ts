@@ -18,7 +18,7 @@ interface PlaygroundProps {
 
     isFetchingData: boolean,
 
-    projectNodes: [],
+    projectNodes?: [],
 
     addNodeToDatabase: (node:object) => void,
 }

@@ -8,19 +8,14 @@ import Type1 from "@/components/nodes/Type1";
 import Type2 from "@/components/nodes/Type2";
 import CustomEdge from "@/components/edges/CustomEdge";
 import Dock from "@/components/Dock";
-import FormInput from "@/components/ui/form/FormInput";
 import Head from "next/head";
 import Appwrite from "@/components/branding/Appwrite"
 import Header from "@/components/Header/Header"
 import NodeEditor from "@/components/NodeEditor"
-import { appwriteAccount, databases } from "../../../appwrite/appwriteConfig"
-import { ID } from "appwrite"
-import { stringify, toJSON, parse } from "flatted"
-import PlaygroundContext, { PlaygroundProvider } from "../../context/Filecontext"
-import CollectionsSidebar from "@/components/CollectionsSidebar"
+import { databases } from "../../../appwrite/appwriteConfig"
+import PlaygroundContext from "../../context/Filecontext"
 import IconOptions, { LoadingIcon } from "@/components/Icons"
-import parseJson from "parse-json";
-import { json } from "stream/consumers";
+import ObjectOptions from "@/components/ObjectOptions";
 
 
 
@@ -493,7 +488,7 @@ export default function Playground() {
                                         <Dock setIcon={handleDockActiveIcon} />
                                     </Panel>
 
-                                    <CollectionsSidebar />
+                                    <ObjectOptions />
 
                                     {/* node editor */}
                                     <NodeEditor id={activeNode} data={activeNodeData?.data} onChange={updateNodeData} />

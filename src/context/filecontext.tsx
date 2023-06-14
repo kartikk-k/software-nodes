@@ -25,7 +25,7 @@ const PlaygroundContext = createContext<PlaygroundProps>({
     createNewFile: () => { },
     isFetchingData: true,
 
-    projectNodes: [],
+    // projectNodes: [],
     addNodeToDatabase: (node: object) => { },
 })
 
