@@ -7,12 +7,12 @@ import { motion } from "framer-motion";
 import Type1 from "@/components/nodes/Type1";
 import Type2 from "@/components/nodes/Type2";
 import CustomEdge from "@/components/edges/CustomEdge";
-import Dock from "@/components/Dock";
+// import Dock from "@/components/Dock";
 import Head from "next/head";
 import Appwrite from "@/components/branding/Appwrite"
 import Header from "@/components/Header/Header"
 import NodeEditor from "@/components/NodeEditor"
-import { databases } from "../../../appwrite/appwriteConfig"
+import { databases } from "../../appwrite/appwriteConfig"
 import PlaygroundContext from "../../context/Filecontext"
 import IconOptions, { LoadingIcon } from "@/components/Icons"
 import ObjectOptions from "@/components/ObjectOptions";
@@ -485,7 +485,7 @@ export default function Playground() {
 
                                     {/* bottom dock */}
                                     <Panel position="bottom-center">
-                                        <Dock setIcon={handleDockActiveIcon} />
+                                        {/* <Dock setIcon={handleDockActiveIcon} /> */}
                                     </Panel>
 
                                     <ObjectOptions />

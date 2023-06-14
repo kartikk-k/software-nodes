@@ -1,10 +1,11 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import AuthContext from "./AuthContext";
 import { ToastError, ToastSuccess } from "@/components/Toasts/Toast";
-import { appwriteAccount, databases } from "../../appwrite/appwriteConfig";
+import { appwriteAccount, databases } from "../appwrite/appwriteConfig";
 import { ID, Query } from "appwrite";
 import { useRouter } from "next/router";
-import { Node, useNodesState } from "reactflow";
+import {  useNodesState } from "reactflow";
+import {Node} from '@reactflow/core'
 
 const PlaygroundContext = createContext<PlaygroundProps>({
     iscollectionsSidebarOpen: false,
@@ -47,7 +48,7 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
     const [lockChanges, setLockChanges] = useState<boolean>(false)
 
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true)
-    const [projectNodes, setProjectNodes] = useState<Node[] | []>([])
+    const [projectNodes, setProjectNodes] = useState<Node[] | undefined>([])
 
 
     let router = useRouter()
@@ -192,7 +193,7 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
 
     // update loader state
     useEffect(() => {
-        if (projectNodes.length < 1) return
+        if (projectNodes && projectNodes.length < 1) return
         setIsFetchingData(false)
 
     }, [projectNodes])
