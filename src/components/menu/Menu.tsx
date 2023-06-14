@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import MenuItem from './MenuItem'
-import PlaygroundContext from '../../context/Filecontext'
+import PlaygroundContext from '@/context/Filecontext'
 
 interface MenuProps {
     isOpen: boolean

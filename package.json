@@ -19,7 +19,7 @@
     "eslint-config-next": "13.4.4",
     "flatted": "^3.2.7",
     "framer-motion": "^10.12.16",
-    "next": "13.4.4",
+    "next": "13.3.0",
     "parse-json": "^7.0.0",
     "postcss": "8.4.24",
     "react": "18.2.0",
