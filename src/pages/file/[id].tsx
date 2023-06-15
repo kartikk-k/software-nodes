@@ -13,7 +13,7 @@ import Appwrite from "@/components/branding/Appwrite"
 import Header from "@/components/Header/Header"
 import NodeEditor from "@/components/NodeEditor"
 import { databases } from "../../appwrite/appwriteConfig"
-import PlaygroundContext from "../../../context/Filecontext"
+import PlaygroundContext from "../../../context/PlaygroundContext"
 import IconOptions, { LoadingIcon } from "@/components/Icons"
 import ObjectOptions from "@/components/ObjectOptions";
 
