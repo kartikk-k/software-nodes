@@ -75,7 +75,7 @@ export default function Playground() {
         },
     ]
 
-    const { activeNodeIcon, setActiveNodeIcon, panOnDrag, cutEdges, lockChanges, isFetchingData, projectNodes, addNodeToDatabase } = useContext(PlaygroundContext)
+    const { activeNodeIcon, setActiveNodeIcon, panOnDrag, cutEdges, lockChanges, isFetchingData, getProjectData, addNodeToDatabase } = useContext(PlaygroundContext)
 
     const [activeNode, setActiveNode] = useState<string | null>(null)
     const [activeNodeData, setActiveNodeData] = useState<Node | null>(null)
@@ -94,6 +94,9 @@ export default function Playground() {
 
 
     useEffect(() => {
+        let projectNodes:any = getProjectData()
+        console.log("projectNodes: ", projectNodes)
+
         if (isFetchingData === true || !projectNodes) return
         if (projectNodes.length >= 1) {
             projectNodes.forEach((node: Node) => {
@@ -103,7 +106,7 @@ export default function Playground() {
         } else {
             setNodes(initialNodes)
         }
-    }, [isFetchingData, projectNodes])
+    }, [isFetchingData])
 
     // handles node click
     function handleClick(id: string) {

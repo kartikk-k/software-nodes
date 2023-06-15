@@ -4,10 +4,10 @@ import { ToastError, ToastSuccess } from "@/components/Toasts/Toast";
 import { appwriteAccount, databases } from "../src/appwrite/appwriteConfig";
 import { ID, Query } from "appwrite";
 import { useRouter } from "next/router";
-import {  useNodesState } from "reactflow";
-import {Node} from '@reactflow/core'
+import { useNodesState } from "reactflow";
+import { Node } from '@reactflow/core'
 
-const PlaygroundContext = createContext<PlaygroundProps>({
+const PlaygroundContext = createContext({
     iscollectionsSidebarOpen: false,
     setIscollectionsSidebarOpen: (value: boolean) => { },
 
@@ -26,8 +26,10 @@ const PlaygroundContext = createContext<PlaygroundProps>({
     createNewFile: () => { },
     isFetchingData: true,
 
-    // projectNodes: Node[],
-    // addNodeToDatabase: (node: object) => { },
+    // projectNodes: () => {},
+    addNodeToDatabase: (node: object) => { },
+    getProjectData: () => { },
+
 })
 
 export default PlaygroundContext
@@ -134,55 +136,25 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
             } = JSON.parse(item.node)
 
             nodes.push(node)
-            // nodes.push({
-
-            // })
-            // nodes.push(item.node)
-            // console.log("item", node)
         })
-
-        // for (const [key, value] of Object.entries(data)) {
-        //     console.log(`${key}: ${value}`);
-        //     let node = JSON.parse(value.node)
-        //     console.log(JSON.parse(value))
-
-        // node = {
-        //     id: value.$id,
-        //     data: {
-        //         label: value.name,
-        //         type: value.type,
-        //         icon: value.icon,
-        //         data: value.data,
-        //         position: value.position,
-        //         sourcePosition: value.sourcePosition,
-        //         targetPosition: value.targetPosition,
-        //     },
-        //     position: value.position,
-        //     type: value.type,
-        //     sourcePosition: value.sourcePosition,
-        //     targetPosition: value.targetPosition,
-        // }
-
-        // nodes.push(node)
-        // }
 
         // initial node
         if (nodes.length === 0) {
-            // nodes.push({
-            //     id: '1',
-            //     type: 'type2',
-            //     data: {
-            //         label: 'Device',
-            //         title: "Remote Device",
-            //         subtitle: "user connected devices",
-            //         icon: "Device",
-            //         animated: true,
-            //         themeColor: true,
-            //         background: true,
-            //         // onclick: handleClick
-            //     },
-            //     position: { x: 400, y: 350 },
-            // })
+            nodes.push({
+                id: '1',
+                type: 'type2',
+                data: {
+                    label: 'Device',
+                    title: "Remote Device",
+                    subtitle: "user connected devices",
+                    icon: "Device",
+                    animated: true,
+                    themeColor: true,
+                    background: true,
+                    // onclick: handleClick
+                },
+                position: { x: 400, y: 350 },
+            })
 
             setProjectNodes(nodes)
         } else {
@@ -217,6 +189,10 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
         })
     }
 
+    const getProjectData = () => {
+        return projectNodes.length > 0 ? projectNodes : "project nodes are empty"
+    }
+
     const contextData = {
         // collections sidebar
         iscollectionsSidebarOpen,
@@ -246,7 +222,7 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
         setProjectNodes,
 
         addNodeToDatabase,
-
+        getProjectData
 
     }
 
