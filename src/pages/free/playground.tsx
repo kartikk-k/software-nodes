@@ -22,7 +22,7 @@ import { ID } from "appwrite";
 export default function Playground() {
 
     const initialEdges = [
-        { id: 'e2-3', source: '1', target: '2', animated: true, type: "custom", arrowHeadType: "arrowclosed", label: "new"},
+        { id: 'e2-3', source: '1', target: '2', sourcePosition: [Position.Right, Position.Bottom, Position.Left, Position.Top], animated: true, type: "custom", arrowHeadType: "arrowclosed", label: "new" },
     ]
 
     const initialNodes: Node[] = [
@@ -58,7 +58,7 @@ export default function Playground() {
                 onclick: handleClick
             },
             position: { x: 600, y: 450 },
-            targetPosition: Position.Left,
+            targetPosition: Position.Bottom,
         },
     ]
 
@@ -142,7 +142,7 @@ export default function Playground() {
         }
 
         const edgeId = edge.id;
-        const edgeOptions = ['straight', 'smoothstep', 'step', 'default'];
+        const edgeOptions = ['straight', 'smoothstep', 'step', 'default', 'custom'];
         const currentEdgeType = edge.type;
         const currentIndex = edgeOptions.indexOf(currentEdgeType!);
         const nextIndex = (currentIndex + 1) % edgeOptions.length;
@@ -234,6 +234,7 @@ export default function Playground() {
                 label: id.toString(),
                 title: "Object",
                 subtitle: "sub heading",
+                background: true,
                 icon: activeNodeIcon ? IconOptions.filter((icon) => icon.id === activeNodeIcon)[0].label : "Device",
                 onclick: handleClick
             },
@@ -318,7 +319,7 @@ export default function Playground() {
 
     // updates edge
     const onConnect = useCallback(
-        (params: Edge | Connection) => setEdges((els) => addEdge({ ...params, type: "smoothstep", animated: false }, els)),
+        (params: Edge | Connection) => setEdges((els) => addEdge({ ...params, type: "smoothstep", animated: false, label:"Component" }, els)),
         [setEdges]
     )
 
@@ -379,7 +380,7 @@ export default function Playground() {
     }, [])
 
     const importNodesData = () => {
-        
+
     }
 
     return (

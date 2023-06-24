@@ -20,8 +20,7 @@ interface NodeData {
 const Type2 = memo(({ data, id }: NodeData) => {
 
     const handleClick = () => {
-        // if(!id) return
-        data.onclick(id.toString())
+        data.onclick(id)
     }
 
     const icon = GetIcon(data.icon)
@@ -51,7 +50,7 @@ const Type2 = memo(({ data, id }: NodeData) => {
             </div>
 
             {/* handles */}
-            {/* <Handle type="source" className='react-flow__handle' position={Position.Bottom} style={{ left: data.background ? '50%' : 17, bottom: -3, background: "white", width: 15, borderRadius:999, backgroundColor: "#7A8088", border: '#5B626C' }} /> */}
+            <Handle type="source" className='react-flow__handle' position={Position.Bottom} style={{ left: data.background ? '50%' : 17, bottom: -3, background: "white", width: 15, borderRadius:999, backgroundColor: "#7A8088", border: '#5B626C' }} />
             {/* <Handle type="target" className='react-flow__handle' position={Position.Top} style={{ left: data.background ? '50%' : 17, bottom: -3, background: "white", opacity: "60%" }} /> */}
             <Handle type="source" className='react-flow__handle' position={Position.Right} style={{ left: data.background ? "" : 33, right: data.background ? -3 : "", background: "white", opacity: "60%" }} />
             <Handle type="target" className='react-flow__handle' position={Position.Left} style={{ left: -3, background: "white", opacity: "60%" }} />

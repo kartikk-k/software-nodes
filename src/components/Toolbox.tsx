@@ -6,7 +6,7 @@ import PlaygroundContext from '../../context/PlaygroundContext'
 
 
 function Toolbox() {
-    const { iscollectionsSidebarOpen, setIscollectionsSidebarOpen, cutEdges, setCutEdges, setPanOnDrag, panOnDrag, lockChanges, setLockChanges }: PlaygroundProps = useContext(PlaygroundContext)
+    const { iscollectionsSidebarOpen, setIscollectionsSidebarOpen, cutEdges, setCutEdges, setPanOnDrag, panOnDrag, lockChanges, setLockChanges } = useContext(PlaygroundContext)
 
     const { setViewport, zoomIn, zoomOut, fitView } = useReactFlow();
 
