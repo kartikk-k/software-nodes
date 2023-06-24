@@ -72,7 +72,7 @@ function ObjectOptions() {
                             {/* list of icons */}
                             <div className='flex py-2 flex-wrap gap-x-3 gap-y-1'>
                                 {iconsList.length!==0 ? iconsList.map((icon) => (
-                                    <div onClick={() => setActiveNodeIcon(icon.id)} key={icon.id} className='text-white hover:scale-110 active:scale-100 duration-200 cursor-pointer hover:bg-primary shrink-0 w-9 h-9 px-2 py-2 rounded-lg'>
+                                    <div onClick={() => setActiveNodeIcon(icon.id)} key={icon.id} className='text-white flex justify-center items-center hover:scale-110 active:scale-100 duration-200 cursor-pointer hover:bg-primary shrink-0 w-9 h-9 px-2 py-2 rounded-lg'>
                                         {icon.icon}
                                     </div>
                                 )) : (

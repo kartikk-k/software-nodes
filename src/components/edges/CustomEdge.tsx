@@ -1,5 +1,5 @@
 import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from 'reactflow';
-import { motion } from 'framer-motion';
+
 
 export default function CustomEdge({
     id,
@@ -11,6 +11,7 @@ export default function CustomEdge({
     targetPosition,
     style = {},
     markerEnd,
+    label
 }: EdgeProps) {
     const [edgePath, labelX, labelY] = getBezierPath({
         sourceX,
@@ -35,11 +36,10 @@ export default function CustomEdge({
                         pointerEvents: 'all',
                     }}
                     className="nodrag nopan"
-
                 >
-                    <div className="text-white">
-                        ×
-                    </div>
+                    <span className="edgebutton bg-primary text-white px-4 py-1 rounded-md">
+                        {label}
+                    </span>
                 </div>
             </EdgeLabelRenderer>
         </>

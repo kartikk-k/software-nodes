@@ -19,9 +19,11 @@ interface PlaygroundProps {
     isFetchingData: boolean,
 
     // projectNodes: [] | undefined,
-    addNodeToDatabase: (node:object) => void,
+    addNodeToDatabase: (node:Node) => void,
 
     getProjectData: () => void,
+
+    updateNodesData: (nodes:object[]) => void,
 }
 
 interface AuthcontextProps {

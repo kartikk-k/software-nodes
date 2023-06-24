@@ -10,9 +10,9 @@ interface NodeData {
         title?: string,
         subtitle?: string,
         icon: string,
-        themeColor?: boolean
-        background?: boolean
-        onclick: (id: string, data: object) => void
+        themeColor?: boolean,
+        background?: boolean,
+        onclick: (id: string) => void,
     },
 }
 
@@ -20,7 +20,8 @@ interface NodeData {
 const Type2 = memo(({ data, id }: NodeData) => {
 
     const handleClick = () => {
-        data.onclick(id, { title: data.title, subtitle: data.subtitle, label: data.label })
+        // if(!id) return
+        data.onclick(id.toString())
     }
 
     const icon = GetIcon(data.icon)
@@ -35,10 +36,9 @@ const Type2 = memo(({ data, id }: NodeData) => {
                 {/* left side */}
                 <div className={`${data.themeColor === true ? "bg-primary shadow-gray-800" : "bg-gray-2 shadow-neutral-800"} ${!data.background ? "shadow-lg" : ""} text-white rounded-md p-2 text-sm`}>
                     {/* icon */}
-                    <div className='h-5 w-5 stroke-white'>
+                    <div className='h-5 w-5 stroke-white flex items-center justify-center stroke-1'>
                         {icon}
                     </div>
-                    {/* <ComputerDesktopIcon className="h-5 w-5 stroke-white" /> */}
                 </div>
 
                 {/* right side */}
@@ -51,9 +51,9 @@ const Type2 = memo(({ data, id }: NodeData) => {
             </div>
 
             {/* handles */}
-            <Handle type="source" className='react-flow__handle' position={Position.Bottom} style={{ left: data.background ? '50%' : 17, bottom: -3, background: "white", opacity: "60%"}} />
-            <Handle type="target" className='react-flow__handle' position={Position.Top} style={{  left: data.background ? '50%' : 17, bottom: -3, background: "white", opacity: "60%" }} />
-            <Handle type="source" className='react-flow__handle' position={Position.Right} style={{ left: data.background ? "": 33,right: data.background ? -3 : "", background: "white", opacity: "60%" }} />
+            {/* <Handle type="source" className='react-flow__handle' position={Position.Bottom} style={{ left: data.background ? '50%' : 17, bottom: -3, background: "white", width: 15, borderRadius:999, backgroundColor: "#7A8088", border: '#5B626C' }} /> */}
+            {/* <Handle type="target" className='react-flow__handle' position={Position.Top} style={{ left: data.background ? '50%' : 17, bottom: -3, background: "white", opacity: "60%" }} /> */}
+            <Handle type="source" className='react-flow__handle' position={Position.Right} style={{ left: data.background ? "" : 33, right: data.background ? -3 : "", background: "white", opacity: "60%" }} />
             <Handle type="target" className='react-flow__handle' position={Position.Left} style={{ left: -3, background: "white", opacity: "60%" }} />
         </motion.div>
     );

@@ -19,27 +19,10 @@ import Dock from "@/components/Dock";
 import { ID } from "appwrite";
 
 
-
-const Icons = [
-    { id: 1, label: "Device", icon: <ComputerDesktopIcon /> },
-    { id: 2, label: "Server", icon: <ServerStackIcon /> },
-    { id: 3, label: "Database", icon: <CircleStackIcon /> },
-    { id: 4, label: "CPU/Chip", icon: <CpuChipIcon /> },
-    { id: 5, label: "Container", icon: <CubeIcon /> },
-    { id: 6, label: "Folders", icon: <FolderIcon /> },
-    { id: 7, label: "Cloud", icon: <CloudIcon /> },
-    { id: 8, label: "Window/Browser", icon: <WindowIcon /> }
-]
-
-
 export default function Playground() {
 
-    const databaseId = "6483cd1f01c3f40565a4"
-    const collectionId = "6483cd47e4a0caa617fe"
-    const documentId = "6483cdb73a2990410f04"
-
     const initialEdges = [
-        { id: 'e2-3', source: '1', target: '2', animated: true, type: "smoothstep" },
+        { id: 'e2-3', source: '1', target: '2', animated: true, type: "custom", arrowHeadType: "arrowclosed", label: "new"},
     ]
 
     const initialNodes: Node[] = [
@@ -47,21 +30,24 @@ export default function Playground() {
             id: '1',
             type: 'type2',
             data: {
+                id: '1',
                 label: 'Device',
                 title: "Remote Device",
                 subtitle: "user connected devices",
                 icon: "Device",
                 animated: true,
                 themeColor: true,
-                background: false,
+                background: true,
                 onclick: handleClick
             },
             position: { x: 400, y: 350 },
+            sourcePosition: Position.Right
         },
         {
             id: '2',
             type: 'type2',
             data: {
+                id: '2',
                 label: 'Device',
                 title: "AWS Server",
                 subtitle: "EC2 Instance",
@@ -87,6 +73,7 @@ export default function Playground() {
     const [variant, setVariant] = useState<BackgroundVariant>(BackgroundVariant.Dots)
 
     const [contentProtector, setContentProtector] = useState<boolean>(false)
+    const [loading, setIsLoading] = useState<boolean>(true)
 
     const [isDragging, setIsDragging] = useState<boolean>(false)
 
@@ -95,20 +82,52 @@ export default function Playground() {
 
 
     useEffect(() => {
-        let projectNodes: any = getProjectData()
-        console.log("projectNodes: ", projectNodes)
-
-        if (isFetchingData === true || !projectNodes) return
-        if (projectNodes.length >= 1) {
-            projectNodes.forEach((node: Node) => {
-                return node.data.onclick = handleClick
-            })
-            setNodes(projectNodes)
-            setId(projectNodes[projectNodes.length - 1].id + 1)
-        } else {
-            setNodes(initialNodes)
+        // if (loading === false) return
+        if (nodes.length !== 0) {
+            setIsLoading(false)
         }
-    }, [isFetchingData])
+    }, [loading])
+
+    useEffect(() => {
+        setNodes(initialNodes)
+    }, [])
+
+    // updating nodes in local storage
+    useEffect(() => {
+        if (isDragging === true) return
+        localStorage.setItem("nodes", nodes ? JSON.stringify(nodes) : JSON.stringify(initialNodes))
+    }, [nodes, isDragging])
+
+    useEffect(() => {
+
+        setInterval(() => {
+            let items = localStorage.getItem("nodes")
+            console.log("nodes", JSON.parse(items!))
+        }, 3000)
+
+    }, [])
+
+    // getting local nodes data -- not working
+    useEffect(() => {
+        let timer = setTimeout(() => {
+            let localNodes = localStorage.getItem("nodes")
+            console.log(localNodes ? "ther" : "not there")
+
+            if (localNodes) {
+                localNodes.length > 0 ? setNodes(JSON.parse(localNodes)) : setNodes(initialNodes)
+            } else {
+                setNodes(initialNodes)
+            }
+
+            setIsLoading(false)
+
+        }, 2000)
+
+        return (() => {
+            clearTimeout(timer)
+        })
+
+    }, [])
 
     // handles node click
     function handleClick(id: string) {
@@ -201,22 +220,11 @@ export default function Playground() {
         setActiveNodeIcon(id)
     }
 
-    useEffect(() => {
-
-        getUniqueID()
-        // console.log("unique id", ID.unique())
-    }, [])
-
-    const getUniqueID = () => {
-        const uniqueId = ID.unique()
-        console.log("unique id", uniqueId)
-    }
-
     // add node 
     const addNewNode = () => {
         if (lockChanges === true) return
 
-        let { x, y } = nodes[nodes.length - 1].position ? nodes[nodes.length - 1].position : { x: 0, y: 0 }
+        let { x, y } = nodes[nodes.length - 1]?.position ? nodes[nodes.length - 1].position : { x: 0, y: 0 }
 
         const newNode: Node = {
             id: id.toString(),
@@ -236,7 +244,7 @@ export default function Playground() {
         tempNode.push(newNode)
         setNodes(tempNode)
 
-        addNodeToDatabase(newNode)
+        // addNodeToDatabase(newNode)
 
         setId(id + 1)
     }
@@ -335,61 +343,6 @@ export default function Playground() {
         }
     };
 
-    const [filteredNodes, setFilteredNodes] = useState<Node[]>([])
-
-    // useEffect(() => {
-    //     filterNodes()
-    // }, [nodes])
-
-    const getNodes = async () => {
-        try {
-            let res = await databases.getDocument(databaseId, collectionId, documentId)
-            // let data = parse(res.data)
-            console.log("data: ", res)
-            // setNodes(data)
-
-        } catch (err) {
-            console.log("err: ", err)
-        }
-    }
-
-    const saveNodes = async () => {
-        console.log(JSON.stringify(filteredNodes))
-        // return
-
-        // try {
-        //     let res = await databases.updateDocument(databaseId, collectionId, documentId, stringify(filteredNodes))
-        //     console.log("res: ", res)
-        // } catch (err) {
-        //     console.log("err: ", err)
-        // }
-    }
-
-    const filterNodes = () => {
-        let filteredData: any = []
-        nodes.map((node) => {
-            if ('onclick' in node.data) {
-                console.log("in")
-                const { onclick, ...rest } = node.data
-
-                filteredData.push({
-                    id: node.id,
-                    type: node.type,
-                    data: rest,
-                    position: node.position
-                })
-            }
-        }, [])
-
-        setFilteredNodes(filteredData)
-
-        console.log("filteredData: ", filteredData)
-    }
-
-    useEffect(() => {
-        console.log("dragging: ", isDragging)
-    }, [isDragging])
-
 
     // update nodes
     const updateNodeData = (id: string, label: string, value: string) => {
@@ -422,9 +375,12 @@ export default function Playground() {
     }
 
     useEffect(() => {
-        if (!nodes) return
         // exportNodesData()
-    }, [nodes])
+    }, [])
+
+    const importNodesData = () => {
+        
+    }
 
     return (
         // <PlaygroundProvider>
@@ -447,7 +403,7 @@ export default function Playground() {
 
                     <div className="w-screen h-screen">
                         <ReactFlowProvider>
-                            {isFetchingData === false ? (
+                            {loading === false ? (
 
                                 <ReactFlow
                                     nodes={nodes}
@@ -471,7 +427,7 @@ export default function Playground() {
 
                                     // controls
                                     panOnScroll
-                                    // selectionOnDrag={true}
+                                    selectionOnDrag={!panOnDrag}
                                     panOnDrag={panOnDrag}
                                     selectionMode={SelectionMode.Partial}
                                     minZoom={0.2}
@@ -479,7 +435,7 @@ export default function Playground() {
                                     snapGrid={[5, 5]}
                                     snapToGrid={true}
                                     zoomOnDoubleClick={false}
-                                    className="touchdevice-flow"
+                                    // className="touchdevice-flow"
                                     onPaneClick={() => { setActiveNode(null) }}
 
                                     // view

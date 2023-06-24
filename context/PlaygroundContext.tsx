@@ -27,8 +27,10 @@ const PlaygroundContext = createContext({
     isFetchingData: true,
 
     // projectNodes: () => {},
-    addNodeToDatabase: (node: object) => { },
+    addNodeToDatabase: (node: Node) => { },
     getProjectData: () => { },
+
+    updateNodesData: (data: Node[]) => { },
 
 })
 
@@ -51,6 +53,9 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
 
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true)
     const [projectNodes, setProjectNodes] = useState<Node[]>([])
+    const [previousProjectNodes, setPreviousProjectNodes] = useState<Node[]>([])
+
+    const [nodesIdKeeper, setNodesIdKeeper] = useState<{ id: string, node_id: string }[]>([])
 
 
     let router = useRouter()
@@ -74,7 +79,6 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
         promise.then((res) => {
             console.log(res)
             ToastSuccess("New file created")
-
             router.push(`/file/${res.$id}/`)
 
         }).catch((err) => {
@@ -86,9 +90,10 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
 
 
     useEffect(() => {
-        if (!isAuthenticated) return
+        // if (!isAuthenticated) return ToastError("You must be logged in to create a new file")
         projectData()
     }, [isAuthenticated])
+
 
     // get project data
     const projectData = () => {
@@ -106,6 +111,11 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
 
         promise.then((res) => {
             console.log(res)
+            res.documents.map((item) => {
+                let temoNodesIdKeeper = [...nodesIdKeeper] // --- pending
+                // temoNodesIdKeeper.push({ id:item.$id.toString(), node_id:  })
+                // setNodesIdKeeper(temoNodesIdKeeper)
+            })
 
             processNodeDocument(res.documents)
             // setIsFetchingData(false)
@@ -122,7 +132,10 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
     const processNodeDocument = (data: any) => {
         let nodes: Node[] = []
 
+      
+
         data.map((item: any) => {
+
             let node: {
                 id: string,
                 position: { x: number, y: number },
@@ -157,8 +170,10 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
             })
 
             setProjectNodes(nodes)
+            setPreviousProjectNodes(nodes)
         } else {
             setProjectNodes(nodes)
+            setPreviousProjectNodes(nodes)
         }
 
     }
@@ -171,7 +186,7 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
     }, [projectNodes])
 
 
-    const addNodeToDatabase = (node: object) => {
+    const addNodeToDatabase = (node: Node) => {
         if (!isAuthenticated) return ToastError("You must be logged in to create a new file")
 
         const promise = databases.createDocument(databaseId!, collectonId!, ID.unique(), {
@@ -183,15 +198,83 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
             console.log(res)
             ToastSuccess("New node created")
 
+            let temoNodesIdKeeper = [...nodesIdKeeper]
+            temoNodesIdKeeper.push({ id: res.$id.toString(), node_id: node.id })
+            setNodesIdKeeper(temoNodesIdKeeper)
+
+            let tempNodes = [...previousProjectNodes]
+            tempNodes.push(node as Node)
+
+            setProjectNodes(tempNodes)
+            setPreviousProjectNodes(tempNodes)
+
         }).catch((err) => {
             console.log(err)
             ToastError("Error creating new node")
         })
     }
 
+    // returns projectNodes
     const getProjectData = () => {
         return projectNodes.length > 0 ? projectNodes : "project nodes are empty"
     }
+
+    const updateNodesData = (data: Node[]) => {
+        let staggedNodes: Node[] = []
+        // let pendingNodes: Node[] = []
+
+        data.forEach((item: Node) => {
+            let previousNode = previousProjectNodes.find((prevItem: Node) => prevItem.id === item.id)
+            // console.log("previousNode: ", previousNode)
+            // console.log("item node: ", item)
+            if (previousNode?.id) {
+                if (item.data !== previousNode?.data || item.position !== previousNode?.position) {
+                    console.log("item: ", item)
+                    console.log("previousNode: ", previousNode)
+                    staggedNodes.push(item)
+                }
+            } else {
+                // pendingNodes.push(item)
+            }
+        })
+
+        if (staggedNodes.length < 1) {
+            return console.log("no changes")
+        }
+
+
+        console.log("stagged nodes: ", staggedNodes)
+
+        staggedNodes.forEach((item: Node) => {
+            updateNodeInDatabase(item, data)
+        })
+
+        
+    }
+
+    const updateNodeInDatabase = (item:Node, data:Node[]) => {
+        let nodeId = findId(item.id)
+
+        if(!nodeId) return
+
+        const promise = databases.updateDocument(databaseId!, collectonId!, nodeId, {
+            node: JSON.stringify(item),
+        }).then((res) => {
+            setPreviousProjectNodes(data)
+            ToastSuccess("Node updated")
+            console.log("node updated", res)
+        }).catch((err) => {
+            ToastError("Error updating node")
+            console.log("error updating node", err)
+        })
+    }
+
+    const findId = (id:string) => {
+        let node = nodesIdKeeper.find((item) => item.node_id === id)
+        return node?.id
+    }
+
+
 
     const contextData = {
         // collections sidebar
@@ -222,7 +305,9 @@ export const PlaygroundProvider = ({ children }: PlaygroundProviderProps) => {
         setProjectNodes,
 
         addNodeToDatabase,
-        getProjectData
+        getProjectData,
+
+        updateNodesData
 
     }
 

@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // trigger for checking if user is logged in
     useEffect(() => {
-        getAccount()
+        // getAccount()
     }, [])
 
     // get logged in user

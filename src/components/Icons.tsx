@@ -1,4 +1,5 @@
 import { BellIcon, CameraIcon, ChartPieIcon, ChatBubbleOvalLeftIcon, CircleStackIcon, ClockIcon, CloudIcon, CodeBracketIcon, Cog6ToothIcon, CommandLineIcon, ComputerDesktopIcon, CpuChipIcon, CreditCardIcon, CubeIcon, CurrencyDollarIcon, DevicePhoneMobileIcon, DeviceTabletIcon, DocumentIcon, DocumentTextIcon, EnvelopeIcon, ExclamationCircleIcon, ExclamationTriangleIcon, FaceFrownIcon, FaceSmileIcon, FilmIcon, FingerPrintIcon, FlagIcon, FolderIcon, GifIcon, HandRaisedIcon, HandThumbDownIcon, HandThumbUpIcon, HashtagIcon, HeartIcon, IdentificationIcon, InboxIcon, KeyIcon, LanguageIcon, LightBulbIcon, LinkIcon, MagnifyingGlassIcon, ServerStackIcon, WindowIcon } from '@heroicons/react/24/outline'
+import { IconBook2, IconBrandGithub, IconBrandGitlab, IconGitBranch, IconGitBranchDeleted, IconGitCommit, IconGitCompare, IconGitFork, IconGitMerge, IconGitPullRequest, IconGitPullRequestClosed, IconGitPullRequestDraft, IconBrandGithubCopilot, IconBrandGit } from '@tabler/icons-react'
 import React from 'react'
 
 const IconOptions: NodeIconsProps[] = [
@@ -10,7 +11,6 @@ const IconOptions: NodeIconsProps[] = [
     { id: 6, label: "Folders", icon: <FolderIcon />, tags: ["folder", "storage", "file", "document"] },
     { id: 7, label: "Cloud", icon: <CloudIcon />, tags: ["cloud", "storage"] },
     { id: 8, label: "Window/Browser", icon: <WindowIcon />, tags: ["window", "browser", "device", "mobile"] },
-
     { id: 9, label: "Notification", icon: <BellIcon />, tags: ["bell", "notification", "ring"] },
     { id: 10, label: "Chat", icon: <ChatBubbleOvalLeftIcon />, tags: ["chat", "bubble", "message"] },
     { id: 11, label: "Camera", icon: <CameraIcon />, tags: ["camera", "photo", "video", "mobile"] },
@@ -23,7 +23,6 @@ const IconOptions: NodeIconsProps[] = [
     { id: 18, label: "Currency", icon: <CurrencyDollarIcon />, tags: ["currency", "money", "dollar", "payment"] },
     { id: 19, label: "Phone", icon: <DevicePhoneMobileIcon />, tags: ["phone", "smart phone", "mobile", "device"] },
     { id: 20, label: "Document", icon: <DocumentIcon />, tags: ["document", "paper"] },
-
     { id: 21, label: "Text/Document", icon: <DocumentTextIcon />, tags: ["document", "page", "text"] },
     { id: 22, label: "Mail", icon: <EnvelopeIcon />, tags: ["mail", "email"] },
     { id: 23, label: "Exclamation", icon: <ExclamationCircleIcon />, tags: ["exclamation", "alert", "warning", "symbol"] },
@@ -46,6 +45,13 @@ const IconOptions: NodeIconsProps[] = [
     { id: 40, label: "Bulb", icon: <LightBulbIcon />, tags: ["bulb", "tips", "ideas", "creative"] },
     { id: 41, label: "Link", icon: <LinkIcon />, tags: ["link", "url", "share"] },
     { id: 42, label: "Search", icon: <MagnifyingGlassIcon />, tags: ["search", "browse"] },
+
+    { id: 43, label: "Repo", icon: <IconBook2 stroke={1.5} />, tags: ["git", "repo"] },
+    { id: 44, label: "Github", icon: <IconBrandGithub stroke={1.5} />, tags: ["github", "git"] },
+    { id: 45, label: "Gitlab", icon: <IconBrandGitlab stroke={1.5} />, tags: ["github", "git"] },
+    { id: 46, label: "Branch", icon: <IconGitBranch stroke={1.5} />, tags: ["github", "git"] },
+    { id: 47, label: "BranchDeleted", icon: <IconGitBranchDeleted stroke={1.5} />, tags: ["github", "git"] },
+    { id: 48, label: "Commit", icon: <IconGitCommit stroke={1.5} />, tags: ["github", "git"] },
 ]
 
 export const GetIcon = (label: string) => {
